@@ -1,0 +1,1262 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tổng kết HHVN 2026</title>
+<meta name="description" content="Tổng kết dữ liệu website LaSoong trong mùa thi Hoa hậu Việt Nam 2026: nguồn truy cập, thiết bị, bình chọn, doanh thu.">
+<meta name="robots" content="noindex,nofollow">
+<style>html,body{margin:0;background:#fff8f3}</style>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+</head>
+<body>
+<div id="dash-root">
+
+<style>
+/* Concept: a magazine-style scroll story. Each chapter is a full-bleed colour "scene" with its own ground;
+   three chapters use a sticky chart stage that swaps as the narrative steps scroll past.
+   Single committed palette (wine, rose, gold, teal, violet); every scene sets its own ink so contrast holds in any theme. */
+#dash-root { --dash-gutter: 0; }
+.hv { container-type: inline-size; container-name: hv; font-family: "Times New Roman", Times, "Liberation Serif", serif; font-size: 17px; line-height: 1.55; color: #3a1a28; }
+.hv *, .hv *::before, .hv *::after { box-sizing: border-box; }
+.hv svg text { font-family: "Times New Roman", Times, "Liberation Serif", serif; }
+.hv a { color: inherit; }
+.hv a:focus-visible, .hv summary:focus-visible { outline: 3px solid #ffc857; outline-offset: 2px; }
+
+/* ---- sticky chapter bar ---- */
+.hv-bar { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 14px; background: #2d0820; color: #fff3f7; padding: 8px clamp(12px, 3vw, 32px); border-bottom: 1px solid rgba(255,255,255,.14); }
+.hv-brand { font-weight: 700; letter-spacing: .16em; text-transform: uppercase; font-size: 14px; text-decoration: none; white-space: nowrap; color: #ffc857; }
+.hv-chips { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; flex: 1; min-width: 0; }
+.hv-chips::-webkit-scrollbar { display: none; }
+.hv-chip { flex: 0 0 auto; text-decoration: none; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; padding: 5px 10px; border-radius: 999px; color: rgba(255,243,247,.78); border: 1px solid transparent; }
+.hv-chip b { color: #ffc857; margin-right: 4px; }
+.hv-chip.on { background: #ffc857; color: #2d0820; }
+.hv-chip.on b { color: #2d0820; }
+.hv-prog { position: absolute; left: 0; bottom: -1px; height: 3px; width: 0; background: linear-gradient(90deg, #ffc857, #ff7aa8); }
+
+/* ---- scene scaffolding ---- */
+.hv-scene { position: relative; overflow: clip; background: var(--bg); color: var(--ink); padding-block: clamp(56px, 9vw, 104px); }
+.hv-in { position: relative; max-width: 1180px; margin: 0 auto; padding-inline: clamp(16px, 4vw, 40px); display: grid; gap: clamp(24px, 4vw, 44px); }
+.hv-hero { --ink: #fff3f7; --mute: rgba(255,243,247,.74); --card: rgba(255,255,255,.1); --line: rgba(255,255,255,.22); --accent: #ffc857; --barmute: rgba(255,255,255,.28); --bad: #ff8a73; --bg: linear-gradient(135deg, #2d0820 0%, #6d1240 50%, #c2185b 100%); }
+.hv-s1 { --ink: #3a1a28; --mute: #7a5a66; --card: #ffffff; --line: #ecd9c4; --accent: #c2185b; --barmute: #d9c9bb; --bad: #d9480f; --bg: #fff5e4; }
+.hv-s2 { --ink: #3a1424; --mute: #85505f; --card: #ffffff; --line: #f3c4d3; --accent: #c2185b; --barmute: #e6bccb; --bad: #d9480f; --bg: linear-gradient(180deg, #ffe3ec, #fff0f4); }
+.hv-s3 { --ink: #231a45; --mute: #5d5588; --card: #ffffff; --line: #d3c8f3; --accent: #6a3fb5; --barmute: #cbc2ea; --bad: #d9480f; --bg: linear-gradient(180deg, #e9e1fb, #f4f0fe); }
+.hv-s4 { --ink: #0b3b36; --mute: #3f716b; --card: #ffffff; --line: #b6e0d8; --accent: #0f9d8e; --barmute: #bad9d3; --bad: #d9480f; --bg: linear-gradient(180deg, #d7f3ed, #ecf9f6); }
+.hv-s5 { --ink: #fff3f7; --mute: rgba(255,243,247,.74); --card: rgba(255,255,255,.08); --line: rgba(255,255,255,.2); --accent: #ffc857; --barmute: rgba(255,255,255,.28); --bad: #ff8a73; --bg: linear-gradient(160deg, #2d0820 0%, #4d0f33 60%, #7a1245 100%); }
+.hv-s6 { --ink: #40200f; --mute: #8a5a3f; --card: #ffffff; --line: #f5cdb0; --accent: #e5641f; --barmute: #ebcfba; --bad: #c92a2a; --bg: linear-gradient(180deg, #ffe7d4, #fff3e8); }
+.hv-s7 { --ink: #3d2c00; --mute: #7f6420; --card: #fffdf6; --line: #f0d98f; --accent: #c98a00; --barmute: #e8d9a9; --bad: #d9480f; --bg: linear-gradient(180deg, #ffefb8, #fff8dc); }
+.hv-s8 { --ink: #10264d; --mute: #4c6490; --card: #ffffff; --line: #c4d6f5; --accent: #2a5fd0; --barmute: #c0cde8; --bad: #d9480f; --bg: linear-gradient(180deg, #dde9ff, #eef4ff); }
+.hv-s9 { --ink: #eef1ff; --mute: rgba(238,241,255,.74); --card: rgba(255,255,255,.08); --line: rgba(255,255,255,.2); --accent: #7fe3d4; --barmute: rgba(255,255,255,.28); --bad: #ff8a73; --bg: linear-gradient(160deg, #141a3a 0%, #232c63 100%); }
+.hv-foot { --ink: #fff3f7; --mute: rgba(255,243,247,.74); --bg: #2d0820; }
+
+/* ---- chapter heading ---- */
+.hv-chh { display: grid; gap: 10px; max-width: 70ch; }
+.hv-wm { position: absolute; right: clamp(8px, 3vw, 40px); top: -50px; font-size: clamp(120px, 24vw, 280px); line-height: 1; font-weight: 700; color: transparent; -webkit-text-stroke: 2px var(--accent); opacity: .22; pointer-events: none; user-select: none; }
+.hv-ck { margin: 0; font-size: 13px; letter-spacing: .24em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+.hv-ct { margin: 0; font-size: clamp(30px, 5vw, 56px); line-height: 1.06; text-transform: uppercase; letter-spacing: .03em; font-weight: 700; text-wrap: balance; }
+.hv-cl { margin: 0; font-size: clamp(18px, 2.1vw, 23px); line-height: 1.5; color: var(--ink); }
+.hv-cl b { color: var(--accent); }
+.hv-hero .hv-cl b, .hv-s5 .hv-cl b, .hv-s9 .hv-cl b { color: var(--accent); }
+
+/* ---- cards ---- */
+.hv-card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: clamp(16px, 2.2vw, 24px); display: grid; gap: 12px; align-content: start; min-width: 0; box-shadow: 0 10px 30px -18px rgba(45,8,32,.35); }
+.hv-s5 .hv-card, .hv-s9 .hv-card, .hv-hero .hv-card { backdrop-filter: blur(6px); box-shadow: none; }
+.hv-card h3 { margin: 0; font-size: 15px; letter-spacing: .12em; text-transform: uppercase; }
+.hv-card h4 { margin: 0; font-size: 15px; letter-spacing: .05em; text-transform: uppercase; }
+.hv-note { margin: 0; font-size: 14px; color: var(--mute); }
+.hv-grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 20px; }
+.hv-grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 18px; }
+.hv-chart { position: relative; min-height: 120px; min-width: 0; }
+.hv-chart.tall { min-height: 320px; }
+#gauge-card { align-content: center; }
+.hv-svg { display: block; overflow: visible; }
+.hv-svg text { fill: var(--ink); }
+.hv-lab { font-size: 14px; }
+.hv-val { font-size: 14px; font-weight: 700; }
+.hv-tick { font-size: 12px; fill: var(--mute) !important; }
+.hv-grid-l { stroke: var(--line); stroke-width: 1; }
+.hv-axis-l { stroke: var(--mute); stroke-width: 1; opacity: .5; }
+.hv-empty { padding: 28px 0; text-align: center; color: var(--mute); }
+.hv-tip { position: absolute; z-index: 6; pointer-events: none; background: #2d0820; color: #fff3f7; border: 1px solid rgba(255,255,255,.2); border-radius: 8px; padding: 8px 10px; font-size: 14px; line-height: 1.35; max-width: 260px; box-shadow: 0 10px 24px -10px rgba(0,0,0,.5); }
+.hv-tip-t { font-weight: 700; color: #ffc857; margin-bottom: 2px; }
+.hv-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 14px; margin: 0; padding: 0; list-style: none; color: var(--mute); }
+.hv-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.hv-sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: var(--barmute); }
+.hv-sw.bad { background: var(--bad); }
+.hv-sw.muted { background: var(--barmute); }
+
+/* ---- hero ---- */
+.hv-hero { padding-block: clamp(36px, 7vw, 84px) clamp(48px, 8vw, 96px); }
+.hv-orb { position: absolute; border-radius: 50%; filter: blur(60px); pointer-events: none; }
+.hv-orb.a { width: 520px; height: 520px; right: -140px; top: -120px; background: radial-gradient(circle, rgba(255,200,87,.55), rgba(255,200,87,0) 70%); }
+.hv-orb.b { width: 460px; height: 460px; left: -160px; bottom: -160px; background: radial-gradient(circle, rgba(255,122,168,.5), rgba(255,122,168,0) 70%); }
+.hv-crown { width: 76px; height: auto; }
+.hv-eyebrow { margin: 0; font-size: 13px; letter-spacing: .24em; text-transform: uppercase; color: #ffc857; }
+.hv-h1 { margin: 0; font-size: clamp(36px, 8vw, 88px); line-height: 1.02; text-transform: uppercase; letter-spacing: .02em; font-weight: 700; text-wrap: balance; }
+.hv-h1 em { font-style: normal; color: #ffc857; }
+.hv-deck { margin: 0; font-size: clamp(19px, 2.4vw, 26px); max-width: 52ch; }
+.hv-deck b { color: #ffc857; }
+.hv-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap: 14px; }
+.hv-kpi { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.22); border-radius: 16px; padding: 16px 18px; display: grid; gap: 4px; align-content: start; min-width: 0; backdrop-filter: blur(6px); }
+.hv-kpi-l { font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: rgba(255,243,247,.78); }
+.hv-big { font-size: clamp(30px, 4vw, 46px); line-height: 1.05; font-weight: 700; font-variant-numeric: tabular-nums; }
+.hv-big small { font-size: 16px; font-weight: 400; opacity: .8; }
+.hv-kpi-s { font-size: 14px; color: rgba(255,243,247,.78); }
+.hv-kpi.crown { background: linear-gradient(135deg, #ffc857, #ff9f6b); border-color: transparent; color: #2d0820; }
+.hv-kpi.crown .hv-kpi-l, .hv-kpi.crown .hv-kpi-s { color: rgba(45,8,32,.78); }
+.hv-kpi.crown .hv-big { font-size: clamp(22px, 2.6vw, 30px); text-transform: uppercase; letter-spacing: .03em; }
+.hv-cue { display: inline-flex; align-items: center; gap: 10px; font-size: 13px; letter-spacing: .22em; text-transform: uppercase; color: rgba(255,243,247,.8); }
+.hv-cue i { width: 22px; height: 36px; border: 2px solid rgba(255,243,247,.7); border-radius: 12px; position: relative; }
+.hv-cue i::after { content: ""; position: absolute; left: 50%; top: 6px; width: 4px; height: 8px; margin-left: -2px; border-radius: 2px; background: #ffc857; }
+
+/* ---- timeline ---- */
+.hv-tl { display: grid; gap: 0; }
+.hv-tl-line { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; margin-bottom: 18px; }
+.hv-tl-fill { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, #c2185b, #f06292, #ffc857); transform-origin: left center; }
+.hv-tl-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 128px), 1fr)); gap: 16px 8px; }
+.hv-tl-list li { position: relative; display: grid; gap: 2px; align-content: start; padding-right: 8px; }
+.hv-tl-list li::before { content: ""; width: 14px; height: 14px; border-radius: 50%; background: var(--card); border: 3px solid var(--accent); margin-bottom: 4px; }
+.hv-tl-list li.fin::before { background: var(--accent); box-shadow: 0 0 0 6px rgba(194,24,91,.18); }
+.hv-tl-list .d { font-weight: 700; font-size: 17px; }
+.hv-tl-list .e { font-size: 14px; color: var(--mute); text-transform: uppercase; letter-spacing: .04em; line-height: 1.3; }
+@container hv (max-width: 700px) { .hv-tl-line { display: none; } }
+
+/* ---- scrolly (sticky stage + steps) ---- */
+.hv-scrolly { display: grid; gap: 20px; }
+.hv-steps { display: grid; gap: 14px; order: -1; }
+.hv-step { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px 20px; display: grid; gap: 6px; }
+.hv-step h3 { margin: 0; font-size: clamp(20px, 2.4vw, 28px); line-height: 1.15; text-transform: uppercase; letter-spacing: .03em; }
+.hv-step p { margin: 0; font-size: 18px; }
+.hv-step p b { color: var(--accent); }
+.hv-stagebox { display: grid; gap: 18px; }
+@container hv (min-width: 920px) {
+  .hv-scrolly { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 48px; align-items: start; }
+  .hv-sticky { position: sticky; top: 70px; }
+  .hv-stagebox { position: relative; display: block; height: min(620px, calc(100vh - 100px)); }
+  .hv-layer { position: absolute; inset: 0; opacity: 0; transform: translateY(18px) scale(.98); pointer-events: none; overflow: auto; align-content: center; }
+  .hv-layer.on { opacity: 1; transform: none; pointer-events: auto; }
+  .hv-steps { order: 0; gap: 0; }
+  .hv-step { min-height: 66vh; align-content: center; background: transparent; border: 0; border-left: 4px solid var(--line); border-radius: 0; padding: 0 0 0 22px; opacity: .38; }
+  .hv-step.on { opacity: 1; border-left-color: var(--accent); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  @container hv (min-width: 920px) {
+    .hv-layer { transition: opacity .55s ease, transform .6s cubic-bezier(.2,.7,.2,1); }
+    .hv-step { transition: opacity .45s ease, border-color .45s ease; }
+  }
+}
+
+/* ---- tiles ---- */
+.hv-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); gap: 14px; }
+.hv-tile { background: var(--card); border: 1px solid var(--line); border-top: 6px solid var(--accent); border-radius: 14px; padding: 14px 16px; display: grid; gap: 4px; min-width: 0; align-content: start; }
+.hv-tile.good { border-top-color: #2fbf71; }
+.hv-tile.warn { border-top-color: #ffb020; }
+.hv-tile.bad { border-top-color: #ff6b57; }
+.hv-tile .hv-big { font-size: clamp(30px, 3.4vw, 42px); }
+.hv-tile .hv-kpi-s { color: var(--mute); }
+.hv-st { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--mute); }
+.hv-ins { border-left: 5px solid var(--accent); padding: 4px 0 4px 14px; display: grid; gap: 2px; min-width: 0; }
+.hv-ins .hv-big { font-size: 34px; color: var(--accent); }
+.hv-ins p { margin: 0; font-size: 16px; }
+.hv-ins.bad { border-left-color: var(--bad); }
+.hv-ins.bad .hv-big { color: var(--bad); }
+.hv-insights { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 16px; align-content: start; }
+
+/* ---- vote chapter ---- */
+.hv-leaders { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 12px; }
+.hv-lead { background: rgba(255,255,255,.08); border: 1px solid var(--line); border-top: 5px solid var(--accent); border-radius: 12px; padding: 12px 14px; display: grid; gap: 2px; min-width: 0; }
+.hv-lead .c { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); line-height: 1.3; }
+.hv-lead .n { font-size: 20px; font-weight: 700; line-height: 1.15; }
+.hv-lead .v { font-size: 26px; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+.hv-lead .g { font-size: 14px; color: var(--mute); }
+.hv-winner { display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: center; background: linear-gradient(135deg, #ffc857, #ff9f6b); color: #2d0820; border-radius: 20px; padding: clamp(18px, 3vw, 30px); }
+.hv-winner .hv-crown { width: 64px; }
+.hv-winner h3 { margin: 0; font-size: clamp(24px, 4vw, 44px); line-height: 1.05; text-transform: uppercase; letter-spacing: .03em; }
+.hv-winner p { margin: 4px 0 0; font-size: 18px; }
+.hv-winner .k { font-size: 12px; letter-spacing: .24em; text-transform: uppercase; }
+.hv-det { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px 20px; }
+.hv-det summary { cursor: pointer; font-size: 15px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; }
+.hv-tablewrap { overflow-x: auto; margin-top: 12px; }
+.hv-rank { width: 100%; border-collapse: collapse; font-size: 15px; min-width: 640px; }
+.hv-rank th { text-align: left; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--mute); font-weight: 400; padding: 6px 8px; border-bottom: 2px solid var(--accent); white-space: nowrap; }
+.hv-rank td { padding: 5px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.hv-rank td.r, .hv-rank th.r { text-align: right; }
+.hv-rank tr.win td { font-weight: 700; color: var(--accent); }
+.hv-barcell { width: 38%; min-width: 180px; }
+.hv-barwrap { display: flex; align-items: center; gap: 8px; }
+.hv-bar2 { display: inline-block; height: 14px; border-radius: 0 3px 3px 0; min-width: 2px; }
+.hv-tag { display: inline-block; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; border: 1px solid var(--accent); border-radius: 3px; padding: 1px 6px; }
+
+/* ---- podium ---- */
+.hv-podium { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; align-items: end; min-height: 260px; }
+.hv-pod { display: grid; align-content: end; gap: 2px; border-radius: 14px 14px 0 0; padding: 14px 12px; color: #fff; text-align: center; min-width: 0; }
+.hv-pod .r { font-size: 40px; font-weight: 700; line-height: 1; opacity: .9; }
+.hv-pod .n { font-size: 17px; font-weight: 700; line-height: 1.15; text-wrap: balance; }
+.hv-pod .v { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.hv-pod .u { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; opacity: .9; }
+
+/* ---- cities list ---- */
+.hv-chips2 { display: flex; flex-wrap: wrap; gap: 8px; }
+.hv-chip2 { border: 1px solid var(--line); border-radius: 999px; padding: 3px 12px; font-size: 14px; background: var(--card); }
+.hv-chip2 b { color: var(--accent); }
+
+/* ---- footer ---- */
+.hv-foot { background: var(--bg); color: var(--ink); padding-block: 40px 56px; }
+.hv-foot details { font-size: 15px; }
+.hv-foot summary { cursor: pointer; font-size: 14px; letter-spacing: .14em; text-transform: uppercase; color: #ffc857; }
+.hv-foot ul { display: grid; gap: 6px; padding-left: 20px; color: var(--mute); }
+.hv-foot a { color: #ffc857; }
+
+/* ---- motion ---- */
+@media (prefers-reduced-motion: no-preference) {
+  .hv-js .hv-rv { opacity: 0; transform: translateY(26px); transition: opacity .7s ease, transform .75s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0ms); }
+  .hv-js .hv-rv.in { opacity: 1; transform: none; }
+  .hv-chart .bar { transform-box: fill-box; transform-origin: left center; transition: transform .9s cubic-bezier(.2,.7,.2,1); }
+  .hv-chart .dot { transform-box: fill-box; transform-origin: center; transition: transform .6s cubic-bezier(.2,.9,.3,1.3); }
+  .hv-js .hv-chart:not(.in) .bar { transform: scaleX(0); }
+  .hv-js .hv-chart:not(.in) .dot { transform: scale(0); }
+  .hv-js .hv-chart:not(.in) .arc { opacity: 0; }
+  .hv-chart .arc { transition: opacity .8s ease; }
+  .hv-cue i::after { animation: hv-wheel 1.6s ease-in-out infinite; }
+  @keyframes hv-wheel { 0% { transform: translateY(0); opacity: 1; } 70% { transform: translateY(14px); opacity: 0; } 100% { opacity: 0; } }
+  .hv-orb.a { animation: hv-drift 14s ease-in-out infinite alternate; }
+  .hv-orb.b { animation: hv-drift 18s ease-in-out infinite alternate-reverse; }
+  @keyframes hv-drift { from { transform: translate(0, 0); } to { transform: translate(-40px, 30px); } }
+  .hv-crown { animation: hv-shine 3.6s ease-in-out infinite alternate; }
+  @keyframes hv-shine { from { filter: drop-shadow(0 0 4px rgba(255,200,87,.35)); } to { filter: drop-shadow(0 0 16px rgba(255,200,87,.9)); } }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .hv-tl-fill { animation: hv-fill linear both; animation-timeline: view(); animation-range: entry 15% cover 55%; }
+    @keyframes hv-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+    .hv-wm { animation: hv-par linear both; animation-timeline: view(); }
+    @keyframes hv-par { from { transform: translateY(60px); } to { transform: translateY(-60px); } }
+  }
+}
+@media print {
+  .hv-bar { display: none; }
+  .hv-scene { break-before: page; }
+  .hv-layer { position: static !important; opacity: 1 !important; transform: none !important; margin-bottom: 16px; }
+  .hv-stagebox { height: auto !important; }
+  .hv-step { opacity: 1 !important; min-height: 0 !important; }
+  .hv-js .hv-rv { opacity: 1 !important; transform: none !important; }
+  .hv-chart .bar, .hv-chart .dot { transform: none !important; }
+  .hv-tip { display: none; }
+}
+</style>
+
+<div class="hv" id="hv-top">
+
+<div class="hv-bar" id="hv-bar">
+  <a class="hv-brand" href="#mo-dau">HHVN 2026</a>
+  <nav class="hv-chips" aria-label="Các chương">
+    <a class="hv-chip" href="#c1" data-ch="c1"><b>1</b>Hành trình</a>
+    <a class="hv-chip" href="#c2" data-ch="c2"><b>2</b>Nguồn khán giả</a>
+    <a class="hv-chip" href="#c3" data-ch="c3"><b>3</b>Thiết bị</a>
+    <a class="hv-chip" href="#c4" data-ch="c4"><b>4</b>Khu vực</a>
+    <a class="hv-chip" href="#c5" data-ch="c5"><b>5</b>Bình chọn</a>
+    <a class="hv-chip" href="#c6" data-ch="c6"><b>6</b>Yêu thích</a>
+    <a class="hv-chip" href="#c7" data-ch="c7"><b>7</b>Doanh thu</a>
+    <a class="hv-chip" href="#c8" data-ch="c8"><b>8</b>Hành trình mua</a>
+    <a class="hv-chip" href="#c9" data-ch="c9"><b>9</b>Trải nghiệm</a>
+  </nav>
+  <i class="hv-prog" id="hv-prog"></i>
+</div>
+
+<header class="hv-scene hv-hero" id="mo-dau" data-pal="wine">
+  <i class="hv-orb a"></i><i class="hv-orb b"></i>
+  <div class="hv-in">
+    <svg class="hv-crown" viewBox="0 0 80 60" aria-hidden="true"><defs><linearGradient id="hvg" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#ffe29a"/><stop offset="1" stop-color="#ff9f6b"/></linearGradient></defs><path d="M6 50 L12 14 L28 30 L40 6 L52 30 L68 14 L74 50 Z" fill="url(#hvg)"/><rect x="6" y="52" width="68" height="6" rx="3" fill="url(#hvg)"/><circle cx="12" cy="12" r="4" fill="#ffe29a"/><circle cx="40" cy="5" r="4" fill="#ffe29a"/><circle cx="68" cy="12" r="4" fill="#ffe29a"/></svg>
+    <p class="hv-eyebrow hv-rv">Báo cáo tổng kết · LaSoong · 01/06 – 18/11/2026</p>
+    <h1 class="hv-h1 hv-rv" style="--d:80ms">Hoa Hậu Việt Nam <em>2026</em> trên LaSoong</h1>
+    <p class="hv-deck hv-rv" style="--d:160ms"><b data-draw="fact" data-source="facts" data-field="value" data-where="key=users" data-fmt="int">—</b> người đã ghé LaSoong theo dõi mùa thi, bỏ <b data-draw="fact" data-source="facts" data-field="value" data-where="key=votes" data-fmt="int">—</b> phiếu cho 25 cô gái vào chung kết và chi <b data-draw="fact" data-source="facts" data-field="value" data-where="key=rev_hhvn" data-fmt="d1">—</b> triệu đồng cho vé và gói bình chọn. Câu chuyện của mùa thi, kể bằng dữ liệu.</p>
+    <div class="hv-kpis" id="kpi">
+      <div class="hv-kpi hv-rv" style="--d:200ms"><span class="hv-kpi-l">Người dùng</span><span class="hv-big" data-draw="fact" data-source="facts" data-field="value" data-where="key=users" data-fmt="int">—</span><span class="hv-kpi-s">trên website trong cả mùa thi</span></div>
+      <div class="hv-kpi hv-rv" style="--d:260ms"><span class="hv-kpi-l">Lượt truy cập</span><span class="hv-big" data-draw="fact" data-source="facts" data-field="value" data-where="key=sessions" data-fmt="int">—</span><span class="hv-kpi-s">mỗi lần một người mở website</span></div>
+      <div class="hv-kpi hv-rv" style="--d:320ms"><span class="hv-kpi-l">Phiếu bình chọn</span><span class="hv-big" data-draw="fact" data-source="facts" data-field="value" data-where="key=votes" data-fmt="int">—</span><span class="hv-kpi-s">cho 25 thí sinh, 6 hạng mục</span></div>
+      <div class="hv-kpi hv-rv" style="--d:380ms"><span class="hv-kpi-l">Doanh thu HHVN</span><span class="hv-big"><span data-draw="fact" data-source="facts" data-field="value" data-where="key=rev_hhvn" data-fmt="d1">—</span> <small>triệu ₫</small></span><span class="hv-kpi-s">tạm tính, chưa đối soát thanh toán</span></div>
+      <div class="hv-kpi hv-rv" style="--d:440ms"><span class="hv-kpi-l">Xem trên điện thoại</span><span class="hv-big"><span data-draw="fact" data-source="facts" data-field="value" data-where="key=share_mobile" data-fmt="d1">—</span><small>%</small></span><span class="hv-kpi-s">người dùng</span></div>
+      <div class="hv-kpi crown hv-rv" style="--d:500ms"><span class="hv-kpi-l">Hoa hậu Việt Nam 2026</span><span class="hv-big">Nguyễn Yến Trang</span><span class="hv-kpi-s">SBD 362 · đứng thứ <b data-draw="fact" data-source="facts" data-field="value" data-where="key=winner_rank" data-fmt="int">—</b> về phiếu</span></div>
+    </div>
+    <span class="hv-cue hv-rv" style="--d:560ms"><i></i>Cuộn để xem câu chuyện</span>
+  </div>
+</header>
+
+<section class="hv-scene hv-s1" id="c1" data-pal="rose" data-ch="c1">
+  <div class="hv-in">
+    <header class="hv-chh hv-rv">
+      <span class="hv-wm" aria-hidden="true">1</span>
+      <p class="hv-ck">Chương 1 trên 9</p>
+      <h2 class="hv-ct">1. Hành trình năm tháng</h2>
+      <p class="hv-cl">Mùa thi đi từ họp báo ngày 05/05 tới đêm chung kết ngày 07/11. Mỗi chặng mới kéo theo một nguồn khán giả khác: lúc mở bình chọn, mạng xã hội mang về khoảng <b>hai phần ba</b> lượt truy cập.</p>
+    </header>
+    <div class="hv-tl hv-rv" id="timeline">
+      <div class="hv-tl-line"><i class="hv-tl-fill"></i></div>
+      <ol class="hv-tl-list" aria-label="Các mốc của mùa thi">
+        <li><span class="d">05/05</span><span class="e">Họp báo khởi động</span></li>
+        <li><span class="d">06/05 – 31/07</span><span class="e">Tour tuyển sinh</span></li>
+        <li><span class="d">29/07 – 01/08</span><span class="e">Sơ khảo</span></li>
+        <li><span class="d">10/08 – 09/09</span><span class="e">Nhà chung</span></li>
+        <li><span class="d">10/09</span><span class="e">Mở bình chọn "Và Bạn Xứng Đáng"</span></li>
+        <li><span class="d">10/10</span><span class="e">Chung khảo</span></li>
+        <li><span class="d">17/10</span><span class="e">Mở bình chọn 5 hạng mục</span></li>
+        <li class="fin"><span class="d">07/11</span><span class="e">Đêm chung kết tại Hải Phòng</span></li>
+      </ol>
+    </div>
+    <div class="hv-card hv-rv" id="phase-card">
+      <h3>Ai đưa khán giả đến trong từng giai đoạn</h3>
+      <ul class="hv-legend">
+        <li><i class="hv-sw" data-c="0"></i>Mạng xã hội</li>
+        <li><i class="hv-sw" data-c="1"></i>Truy cập trực tiếp</li>
+        <li><i class="hv-sw" data-c="2"></i>Tìm kiếm</li>
+        <li><i class="hv-sw" data-c="3"></i>Website giới thiệu</li>
+        <li><i class="hv-sw" data-c="4"></i>Quảng cáo</li>
+        <li><i class="hv-sw" data-c="5"></i>Không xác định nguồn</li>
+      </ul>
+      <div class="hv-chart" data-draw="ch-phase" data-source="giai_doan"></div>
+      <p class="hv-note">Tỷ trọng nguồn trong mỗi giai đoạn; số bên phải là tổng lượt truy cập. GA4 không có dữ liệu trong <span data-draw="fact" data-source="facts" data-field="value" data-where="key=nodata_days" data-fmt="int">—</span> ngày đầu mùa thi (05/05 – 31/05).</p>
+    </div>
+  </div>
+</section>
+
+<section class="hv-scene hv-s2" id="c2" data-pal="rose" data-ch="c2">
+  <div class="hv-in">
+    <header class="hv-chh hv-rv">
+      <span class="hv-wm" aria-hidden="true">2</span>
+      <p class="hv-ck">Chương 2 trên 9</p>
+      <h2 class="hv-ct">2. Khán giả đến từ đâu</h2>
+      <p class="hv-cl">Cuộn xuống để xem từng lớp của câu chuyện: ai đưa khán giả tới, ai giữ họ lại, và kênh nào còn bỏ ngỏ.</p>
+    </header>
+    <div class="hv-scrolly" id="scrolly-2">
+      <div class="hv-sticky"><div class="hv-stagebox">
+        <div class="hv-card hv-layer on" data-l="0">
+          <h3>Lượt truy cập theo nhóm nguồn</h3>
+          <ul class="hv-legend"><li><i class="hv-sw" data-c="0"></i>Mạng xã hội</li><li><i class="hv-sw muted"></i>Nguồn khác</li></ul>
+          <div class="hv-chart" data-draw="ch-family" data-source="truy_cap facts"></div>
+        </div>
+        <div class="hv-card hv-layer" data-l="1">
+          <h3>Tỷ lệ ở lại tương tác theo nguồn</h3>
+          <ul class="hv-legend"><li><i class="hv-sw" data-c="0"></i>Từ 70% trở lên</li><li><i class="hv-sw muted"></i>40 – 70%</li><li><i class="hv-sw bad"></i>Dưới 40%</li></ul>
+          <div class="hv-chart" data-draw="ch-stay" data-source="truy_cap"></div>
+          <p class="hv-note">Ở lại tương tác: truy cập kéo dài trên 10 giây, xem từ 2 trang hoặc có hành động như bình chọn, đăng ký.</p>
+        </div>
+        <div class="hv-card hv-layer" data-l="2">
+          <h3>Ba tín hiệu đáng chú ý</h3>
+          <div class="hv-insights" id="c2-insights">
+            <div class="hv-ins"><span class="hv-big"><span data-draw="fact" data-source="facts" data-field="value" data-where="key=press_engaged" data-fmt="d1">—</span>%</span><p>độc giả báo Thanh Niên ở lại tương tác, cao nhất trong các nguồn.</p></div>
+            <div class="hv-ins"><span class="hv-big"><span data-draw="fact" data-source="facts" data-field="value" data-where="key=qr_key" data-fmt="d1">—</span>%</span><p>lượt quét mã QR dẫn tới một hành động quan trọng.</p></div>
+            <div class="hv-ins bad"><span class="hv-big"><span data-draw="fact" data-source="facts" data-field="value" data-where="key=paid_engaged" data-fmt="d1">—</span>%</span><p>là tỷ lệ ở lại của <span data-draw="fact" data-source="facts" data-field="value" data-where="key=paid_sessions" data-fmt="int">—</span> lượt đến từ quảng cáo Facebook, thấp nhất.</p></div>
+            <div class="hv-ins bad"><span class="hv-big" data-draw="fact" data-source="facts" data-field="value" data-where="key=tracked_sessions" data-fmt="int">—</span><p>lượt truy cập từ <span data-draw="fact" data-source="facts" data-field="value" data-where="key=tracked_links" data-fmt="int">—</span> link riêng đã tạo cho thí sinh, trường và cộng tác viên.</p></div>
+          </div>
+        </div>
+      </div></div>
+      <div class="hv-steps">
+        <div class="hv-step on" data-l="0"><h3>Mạng xã hội là cửa chính</h3><p>Gần một nửa lượt truy cập (<b data-draw="fact" data-source="facts" data-field="value" data-where="key=share_social" data-fmt="d1">—</b>%) đến từ Facebook và Zalo. Riêng Facebook là nhóm nguồn lớn nhất.</p></div>
+        <div class="hv-step" data-l="1"><h3>Người ở lại lâu nhất là độc giả báo chí</h3><p>Báo chí và mã QR có ít lượt nhưng giữ chân tốt nhất. Quảng cáo Facebook mang lượt đến mà người xem rời đi rất nhanh.</p></div>
+        <div class="hv-step" data-l="2"><h3>Link riêng gần như chưa được dùng</h3><p>Hàng trăm link được tạo để biết thí sinh, trường nào mang khán giả tới, nhưng gần như không ai bấm. Đó là kênh còn bỏ ngỏ cho mùa sau.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hv-scene hv-s3" id="c3" data-pal="violet" data-ch="c3">
+  <div class="hv-in">
+    <header class="hv-chh hv-rv">
+      <span class="hv-wm" aria-hidden="true">3</span>
+      <p class="hv-ck">Chương 3 trên 9</p>
+      <h2 class="hv-ct">3. Họ xem bằng thiết bị gì</h2>
+      <p class="hv-cl"><b data-draw="fact" data-source="facts" data-field="value" data-where="key=share_mobile" data-fmt="d1">—</b>% người xem dùng điện thoại, và <b data-draw="fact" data-source="facts" data-field="value" data-where="key=share_fbapp" data-fmt="d1">—</b>% lượt truy cập mở ngay trong ứng dụng Facebook. Điều lạ là phần lớn doanh thu lại được ghi trên máy tính, đặc biệt là máy Mac.</p>
+    </header>
+    <div class="hv-grid2">
+      <div class="hv-card hv-rv" id="ring-card">
+        <h3>Bốn cách khán giả cầm điện thoại</h3>
+        <div class="hv-chart tall" data-draw="ch-ring" data-source="facts"></div>
+        <p class="hv-note">Mỗi vòng là một tỷ lệ; vòng càng đầy càng nhiều khán giả. Ba vòng đầu tính trên người dùng GA4, vòng "Mở trong ứng dụng Facebook" tính trên phiên Clarity.</p>
+      </div>
+      <div class="hv-card hv-rv" id="device-card">
+        <h3>Người dùng và doanh thu theo thiết bị</h3>
+        <ul class="hv-legend"><li><i class="hv-sw" data-c="0"></i>Tỷ trọng người dùng</li><li><i class="hv-sw" data-c="3"></i>Tỷ trọng doanh thu GA4</li></ul>
+        <div class="hv-chart" data-draw="ch-fly" data-dim="thiet_bi" data-source="thiet_bi facts"></div>
+        <div class="hv-chart" data-draw="ch-fly" data-dim="he_dieu_hanh" data-source="thiet_bi facts"></div>
+      </div>
+    </div>
+    <div class="hv-grid2">
+      <div class="hv-card hv-rv" id="browser-card">
+        <h3>Trình duyệt mở website (Clarity, 90 ngày)</h3>
+        <ul class="hv-legend"><li><i class="hv-sw" data-c="0"></i>Mở trong ứng dụng</li><li><i class="hv-sw muted"></i>Trình duyệt thường</li></ul>
+        <div class="hv-chart" data-draw="ch-browser" data-source="thiet_bi"></div>
+      </div>
+      <div class="hv-insights hv-rv" id="c3-insights">
+        <div class="hv-ins"><span class="hv-big"><span data-draw="fact" data-source="facts" data-field="value" data-where="key=share_ios" data-fmt="d1">—</span>%</span><p>người dùng dùng iPhone hoặc iPad.</p></div>
+        <div class="hv-ins"><span class="hv-big"><span data-draw="fact" data-source="facts" data-field="value" data-where="key=share_inapp" data-fmt="d1">—</span>%</span><p>người dùng xem qua trình duyệt nằm trong ứng dụng như Facebook, Zalo.</p></div>
+        <div class="hv-ins bad"><span class="hv-big" data-draw="fact" data-source="facts" data-field="value" data-where="key=mac_users" data-fmt="int">—</span><p>người dùng máy Mac được ghi <span data-draw="fact" data-source="facts" data-field="value" data-where="key=share_rev_mac" data-fmt="d1">—</span>% doanh thu GA4. Nhiều khả năng do giao dịch thử, cần đối soát.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hv-scene hv-s4" id="c4" data-pal="teal" data-ch="c4">
+  <div class="hv-in">
+    <header class="hv-chh hv-rv">
+      <span class="hv-wm" aria-hidden="true">4</span>
+      <p class="hv-ck">Chương 4 trên 9</p>
+      <h2 class="hv-ct">4. Họ ở đâu</h2>
+      <p class="hv-cl">Hà Nội chiếm <b data-draw="fact" data-source="facts" data-field="value" data-where="key=hanoi_share" data-fmt="d1">—</b>% người dùng. Hải Phòng, nơi tổ chức đêm chung kết, đứng thứ ba về người dùng nhưng thứ hai về doanh thu.</p>
+    </header>
+    <div class="hv-card hv-rv" id="city-card">
+      <h3>Mỗi bong bóng là một thành phố</h3>
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap" class="hv-legend">
+        <span>Bong bóng càng to, người dùng càng nhiều. Màu càng đậm, doanh thu GA4 càng cao.</span>
+      </div>
+      <div class="hv-chart tall" data-draw="ch-bubbles" data-source="thiet_bi facts" style="min-height: 380px"></div>
+      <div class="hv-chips2" data-draw="city-list" data-source="thiet_bi"></div>
+      <p class="hv-note">Doanh thu là số GA4 chưa lọc giao dịch thử. GA4 của LaSoong không có dữ liệu tuổi và giới tính.</p>
+    </div>
+  </div>
+</section>
+
+<section class="hv-scene hv-s5" id="c5" data-pal="wine" data-ch="c5">
+  <div class="hv-in">
+    <header class="hv-chh hv-rv">
+      <span class="hv-wm" aria-hidden="true">5</span>
+      <p class="hv-ck">Chương 5 trên 9</p>
+      <h2 class="hv-ct">5. Cuộc đua bình chọn</h2>
+      <p class="hv-cl">Vũ Hồng Hạnh dẫn đầu với <b data-draw="fact" data-source="facts" data-field="value" data-where="key=top_votes" data-fmt="int">—</b> phiếu, bằng <b data-draw="fact" data-source="facts" data-field="value" data-where="key=top_share" data-fmt="d1">—</b>% tổng phiếu. Nhưng vương miện thuộc về người đứng thứ <b data-draw="fact" data-source="facts" data-field="value" data-where="key=winner_rank" data-fmt="int">—</b>.</p>
+    </header>
+    <div class="hv-scrolly" id="scrolly-5">
+      <div class="hv-sticky"><div class="hv-stagebox">
+        <div class="hv-card hv-layer on" data-l="0">
+          <h3>Top 10 phiếu bình chọn</h3>
+          <ul class="hv-legend"><li><i class="hv-sw" data-c="0"></i>Thí sinh</li><li><i class="hv-sw" data-c="1"></i>Hoa hậu Nguyễn Yến Trang</li></ul>
+          <div class="hv-chart" data-draw="ch-topvotes" data-source="thi_sinh"></div>
+        </div>
+        <div class="hv-card hv-layer" data-l="1">
+          <h3>Phiếu so với lượt xem hồ sơ</h3>
+          <ul class="hv-legend"><li><i class="hv-sw" data-c="0"></i>Thí sinh</li><li><i class="hv-sw" data-c="1"></i>Hoa hậu Nguyễn Yến Trang</li></ul>
+          <div class="hv-chart tall" data-draw="ch-scatter" data-source="thi_sinh"></div>
+          <p class="hv-note">Trục ngang: lượt xem hồ sơ. Trục dọc: phiếu bình chọn. Cả hai trục theo thang nhân 10.</p>
+        </div>
+        <div class="hv-card hv-layer" data-l="2">
+          <h3>Người dẫn đầu từng hạng mục</h3>
+          <div class="hv-leaders" data-draw="cat-lead" data-source="hang_muc"></div>
+        </div>
+      </div></div>
+      <div class="hv-steps">
+        <div class="hv-step on" data-l="0"><h3>Ba người đầu nắm hơn một nửa</h3><p>Ba thí sinh đứng đầu giữ <b data-draw="fact" data-source="facts" data-field="value" data-where="key=top3_share" data-fmt="d1">—</b>% số phiếu của cả 25 cô gái chung kết.</p></div>
+        <div class="hv-step" data-l="1"><h3>Phiếu không đi cùng lượt xem</h3><p>Người dẫn đầu phiếu chỉ có <b data-draw="fact" data-source="facts" data-field="value" data-where="key=top_views" data-fmt="int">—</b> lượt xem hồ sơ. Phiếu có thể đến qua trang hạng mục chứ không qua trang thí sinh.</p></div>
+        <div class="hv-step" data-l="2"><h3>Mỗi hạng mục một người dẫn đầu</h3><p>Sáu hạng mục có bốn gương mặt dẫn đầu khác nhau, và khoảng cách với hạng hai nhiều chỗ lên tới gấp ba, gấp bốn lần.</p></div>
+      </div>
+    </div>
+    <div class="hv-winner hv-rv" id="winner">
+      <svg class="hv-crown" viewBox="0 0 80 60" aria-hidden="true"><path d="M6 50 L12 14 L28 30 L40 6 L52 30 L68 14 L74 50 Z" fill="#2d0820"/><rect x="6" y="52" width="68" height="6" rx="3" fill="#2d0820"/></svg>
+      <div><span class="k">Hoa hậu Việt Nam 2026</span><h3>Nguyễn Yến Trang</h3><p>SBD 362 · <b data-draw="fact" data-source="facts" data-field="value" data-where="key=winner_votes" data-fmt="int">—</b> phiếu, đứng thứ <b data-draw="fact" data-source="facts" data-field="value" data-where="key=winner_rank" data-fmt="int">—</b> về tổng phiếu bình chọn.</p></div>
+    </div>
+    <div class="hv-grid3" id="cats-grid">
+      <div class="hv-card hv-rv"><h4>"Và Bạn Xứng Đáng"</h4><div class="hv-chart" data-draw="cat" data-cat="&quot;Và Bạn Xứng Đáng&quot;" data-source="hang_muc"></div></div>
+      <div class="hv-card hv-rv"><h4>Người đẹp được bình chọn nhiều nhất</h4><div class="hv-chart" data-draw="cat" data-cat="Người đẹp được bình chọn nhiều nhất" data-source="hang_muc"></div></div>
+      <div class="hv-card hv-rv"><h4>Đại sứ Nhân ái</h4><div class="hv-chart" data-draw="cat" data-cat="Đại sứ Nhân ái" data-source="hang_muc"></div></div>
+      <div class="hv-card hv-rv"><h4>Đại sứ Truyền thông và Nghệ thuật</h4><div class="hv-chart" data-draw="cat" data-cat="Đại sứ Truyền thông và Nghệ thuật" data-source="hang_muc"></div></div>
+      <div class="hv-card hv-rv"><h4>Đại sứ Thời trang và Thể thao</h4><div class="hv-chart" data-draw="cat" data-cat="Đại sứ Thời trang và Thể thao" data-source="hang_muc"></div></div>
+      <div class="hv-card hv-rv"><h4>Đại sứ Du lịch và Môi trường</h4><div class="hv-chart" data-draw="cat" data-cat="Đại sứ Du lịch và Môi trường" data-source="hang_muc"></div></div>
+    </div>
+    <details class="hv-det hv-rv" id="rank-card">
+      <summary>Xem bảng đầy đủ 25 thí sinh chung kết</summary>
+      <div class="hv-tablewrap">
+        <table class="hv-rank" data-source="thi_sinh" data-row-key="name">
+          <thead><tr><th class="r">Hạng</th><th data-field="name">Thí sinh</th><th data-field="sbd">SBD</th><th data-field="votes">Phiếu bình chọn</th><th class="r">Tỷ trọng</th><th class="r" data-field="interest">Quan tâm</th><th class="r" data-field="views">Xem hồ sơ</th><th>Danh hiệu</th></tr></thead>
+          <tbody data-draw="rank-rows"></tbody>
+        </table>
+      </div>
+      <p class="hv-note">Phiếu và lượt quan tâm đọc trên trang hồ sơ từng thí sinh ngày 18/11/2026, sau khi cả 6 cổng bình chọn đã đóng. Lượt xem hồ sơ lấy từ GA4.</p>
+    </details>
+  </div>
+</section>
+
+<section class="hv-scene hv-s6" id="c6" data-pal="peach" data-ch="c6">
+  <div class="hv-in">
+    <header class="hv-chh hv-rv">
+      <span class="hv-wm" aria-hidden="true">6</span>
+      <p class="hv-ck">Chương 6 trên 9</p>
+      <h2 class="hv-ct">6. Ai được yêu thích</h2>
+      <p class="hv-cl">Lượt quan tâm và lượt xem hồ sơ vẽ ra một bảng xếp hạng khác hẳn bảng phiếu. Đinh Hoàng Gia Linh dẫn đầu lượt quan tâm (<b data-draw="fact" data-source="facts" data-field="value" data-where="key=top_interest" data-fmt="int">—</b>), còn Phạm Lê Ái Linh được xem hồ sơ nhiều nhất (<b data-draw="fact" data-source="facts" data-field="value" data-where="key=top_profile_views" data-fmt="int">—</b> lượt).</p>
+    </header>
+    <div class="hv-card hv-rv" id="podium-card">
+      <h3>Bục vinh danh lượt quan tâm</h3>
+      <div class="hv-podium" data-draw="podium" data-source="thi_sinh"></div>
+    </div>
+    <div class="hv-grid2">
+      <div class="hv-card hv-rv" id="interest-card">
+        <h3>Top 10 lượt quan tâm</h3>
+        <div class="hv-chart" data-draw="ch-interest" data-source="thi_sinh"></div>
+        <p class="hv-note">Lượt quan tâm là số lần bấm "Quan tâm" cộng dồn; mỗi người có thể quan tâm mỗi ngày một lần.</p>
+      </div>
+      <div class="hv-card hv-rv" id="views-card">
+        <h3>Top 10 lượt xem hồ sơ</h3>
+        <ul class="hv-legend"><li><i class="hv-sw" data-c="0"></i>Vào chung kết</li><li><i class="hv-sw muted"></i>Không nằm trong 25 thí sinh chung kết</li></ul>
+        <div class="hv-chart" data-draw="ch-views" data-source="thi_sinh"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hv-scene hv-s7" id="c7" data-pal="gold" data-ch="c7">
+  <div class="hv-in">
+    <header class="hv-chh hv-rv">
+      <span class="hv-wm" aria-hidden="true">7</span>
+      <p class="hv-ck">Chương 7 trên 9</p>
+      <h2 class="hv-ct">7. Doanh thu đến từ đâu</h2>
+      <p class="hv-cl">GA4 ghi <b data-draw="fact" data-source="facts" data-field="value" data-where="key=rev_item" data-fmt="d1">—</b> triệu đồng, nhưng gần một nửa là giao dịch thử và một sự kiện khác. Doanh thu của HHVN là <b data-draw="fact" data-source="facts" data-field="value" data-where="key=rev_hhvn" data-fmt="d1">—</b> triệu đồng, chia gần đều giữa gói bình chọn và vé đêm chung kết.</p>
+    </header>
+    <div class="hv-scrolly" id="scrolly-7">
+      <div class="hv-sticky"><div class="hv-stagebox">
+        <div class="hv-card hv-layer on" data-l="0">
+          <h3>Từ con số GA4 tới doanh thu thật của HHVN (triệu ₫)</h3>
+          <ul class="hv-legend"><li><i class="hv-sw" data-c="0"></i>GA4 ghi nhận</li><li><i class="hv-sw bad"></i>Loại ra</li><li><i class="hv-sw" data-c="2"></i>Doanh thu HHVN</li></ul>
+          <div class="hv-chart" data-draw="ch-bridge" data-source="doanh_thu"></div>
+        </div>
+        <div class="hv-card hv-layer" data-l="1">
+          <h3>HHVN bán được gì (triệu ₫)</h3>
+          <ul class="hv-legend"><li><i class="hv-sw" data-c="0"></i>Gói bình chọn</li><li><i class="hv-sw" data-c="1"></i>Vé đêm chung kết</li><li><i class="hv-sw" data-c="2"></i>Vé chung khảo</li></ul>
+          <div class="hv-chart" data-draw="ch-mix" data-source="doanh_thu"></div>
+          <p class="hv-note">Bán <span data-draw="fact" data-source="facts" data-field="value" data-where="key=pack_count" data-fmt="int">—</span> gói bình chọn và <span data-draw="fact" data-source="facts" data-field="value" data-where="key=ticket_final_count" data-fmt="int">—</span> vé đêm chung kết.</p>
+        </div>
+        <div class="hv-card hv-layer" data-l="2">
+          <h3>Doanh thu theo kênh khách đến</h3>
+          <div class="hv-chart" data-draw="ch-revch" data-source="truy_cap"></div>
+          <p class="hv-note"><span data-draw="fact" data-source="facts" data-field="value" data-where="key=share_unattributed_rev" data-fmt="d1">—</span>% doanh thu rơi vào "không xác định nguồn" hoặc "truy cập trực tiếp".</p>
+        </div>
+      </div></div>
+      <div class="hv-steps">
+        <div class="hv-step on" data-l="0"><h3>Từ 1.246,9 xuống 710,9</h3><p>Một "Vé thử nghiệm 04" trị giá 499 triệu đồng, các vé thử khác và concert Thanh Xuân được loại ra, còn lại doanh thu của HHVN.</p></div>
+        <div class="hv-step" data-l="1"><h3>Gói bình chọn và vé, mỗi bên một nửa</h3><p>GÓI 1TR chiếm <b data-draw="fact" data-source="facts" data-field="value" data-where="key=pack1tr_share" data-fmt="d1">—</b>% doanh thu gói; vé STANDARD chiếm <b data-draw="fact" data-source="facts" data-field="value" data-where="key=std_share" data-fmt="d1">—</b>% doanh thu vé đêm chung kết.</p></div>
+        <div class="hv-step" data-l="2"><h3>Chưa biết kênh nào bán được hàng</h3><p>Gần như toàn bộ doanh thu không gắn được nguồn, nên chưa đo được quảng bá nào hiệu quả. Số liệu là doanh thu GA4 tạm tính, chưa đối soát với cổng thanh toán.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hv-scene hv-s8" id="c8" data-pal="sky" data-ch="c8">
+  <div class="hv-in">
+    <header class="hv-chh hv-rv">
+      <span class="hv-wm" aria-hidden="true">8</span>
+      <p class="hv-ck">Chương 8 trên 9</p>
+      <h2 class="hv-ct">8. Khán giả đi được bao xa</h2>
+      <p class="hv-cl">Chỉ <b data-draw="fact" data-source="facts" data-field="value" data-where="key=cta_rate" data-fmt="d1">—</b>% người bấm nút trên trang thí sinh có kết quả được ghi nhận, và <b data-draw="fact" data-source="facts" data-field="value" data-where="key=reg_rate" data-fmt="d1">—</b>% người bắt đầu đăng ký đi tới cuối. Ngược lại, đã vào bước thanh toán thì <b data-draw="fact" data-source="facts" data-field="value" data-where="key=buy_rate" data-fmt="d1">—</b>% mua thành công.</p>
+    </header>
+    <div class="hv-grid3">
+      <div class="hv-card hv-rv" id="funnel-vote"><h3>Quan tâm và bình chọn</h3><div class="hv-chart" data-draw="funnel" data-funnel="Quan tâm và bình chọn" data-source="hanh_vi"></div></div>
+      <div class="hv-card hv-rv" id="funnel-reg" style="--d:100ms"><h3>Đăng ký</h3><div class="hv-chart" data-draw="funnel" data-funnel="Đăng ký" data-source="hanh_vi"></div></div>
+      <div class="hv-card hv-rv" id="funnel-buy" style="--d:200ms"><h3>Mua hàng</h3><div class="hv-chart" data-draw="funnel" data-funnel="Mua hàng" data-source="hanh_vi"></div></div>
+    </div>
+    <p class="hv-note">Số người ở mỗi bước trong cả mùa thi; phần trăm so với bước đầu. Phễu mua hàng tính từ bước thanh toán, vì nhiều người mua gói bình chọn không qua giỏ hàng.</p>
+  </div>
+</section>
+
+<section class="hv-scene hv-s9" id="c9" data-pal="navy" data-ch="c9">
+  <div class="hv-in">
+    <header class="hv-chh hv-rv">
+      <span class="hv-wm" aria-hidden="true">9</span>
+      <p class="hv-ck">Chương 9 trên 9</p>
+      <h2 class="hv-ct">9. Trải nghiệm trên website</h2>
+      <p class="hv-cl">Website hiện nội dung đủ nhanh nhưng phản hồi chậm khi chạm, và <b data-draw="fact" data-source="facts" data-field="value" data-where="key=js_share" data-fmt="d1">—</b>% lượt truy cập gặp lỗi kỹ thuật, phần lớn do bộ nhúng Zalo. Số liệu Microsoft Clarity, 90 ngày gần nhất.</p>
+    </header>
+    <div class="hv-grid2">
+      <div class="hv-card hv-rv" id="gauge-card">
+        <h3>Điểm hiệu năng</h3>
+        <div class="hv-chart" data-draw="ch-gauge" data-source="facts" style="min-height: 210px"></div>
+      </div>
+      <div class="hv-tiles" id="ux-tiles">
+        <div class="hv-tile warn hv-rv"><span class="hv-st">Cần cải thiện</span><span class="hv-big"><span data-draw="fact" data-source="facts" data-field="value" data-where="key=lcp" data-fmt="d1">—</span> <small>giây</small></span><span class="hv-kpi-s">Hiện nội dung chính</span></div>
+        <div class="hv-tile warn hv-rv" style="--d:80ms"><span class="hv-st">Cần cải thiện</span><span class="hv-big"><span data-draw="fact" data-source="facts" data-field="value" data-where="key=inp" data-fmt="int">—</span> <small>ms</small></span><span class="hv-kpi-s">Độ trễ khi chạm, bấm</span></div>
+        <div class="hv-tile good hv-rv" style="--d:160ms"><span class="hv-st">Tốt</span><span class="hv-big" data-draw="fact" data-source="facts" data-field="value" data-where="key=cls" data-fmt="d3">—</span><span class="hv-kpi-s">Độ xô lệch bố cục</span></div>
+        <div class="hv-tile bad hv-rv" style="--d:240ms"><span class="hv-st">Cần sửa</span><span class="hv-big"><span data-draw="fact" data-source="facts" data-field="value" data-where="key=js_share" data-fmt="d1">—</span><small>%</small></span><span class="hv-kpi-s">Lượt truy cập gặp lỗi kỹ thuật</span></div>
+        <div class="hv-tile warn hv-rv" style="--d:320ms"><span class="hv-st">Theo dõi</span><span class="hv-big"><span data-draw="fact" data-source="facts" data-field="value" data-where="key=quick_back" data-fmt="d1">—</span><small>%</small></span><span class="hv-kpi-s">Lượt truy cập thoát nhanh</span></div>
+      </div>
+    </div>
+    <div class="hv-card hv-rv" id="jserr-card">
+      <h3>Lỗi kỹ thuật đến từ đâu</h3>
+      <ul class="hv-legend"><li><i class="hv-sw bad"></i>Bộ nhúng Zalo</li><li><i class="hv-sw muted"></i>Lỗi khác</li></ul>
+      <div class="hv-chart" data-draw="ch-jserr" data-source="facts" style="min-height: 70px;"></div>
+    </div>
+  </div>
+</section>
+
+<footer class="hv-scene hv-foot" id="nguon" data-pal="wine">
+  <div class="hv-in">
+    <details>
+      <summary>Nguồn số liệu và cách đọc</summary>
+      <ul>
+        <li>Người dùng, lượt truy cập, thiết bị, thành phố, hành vi và doanh thu: Google Analytics 4 của LaSoong, 01/06 – 18/11/2026, đọc ngày 18/11/2026.</li>
+        <li>Trình duyệt, tốc độ và lỗi kỹ thuật: Microsoft Clarity, 90 ngày gần nhất tới 18/11/2026.</li>
+        <li>Phiếu bình chọn và lượt quan tâm: trang hồ sơ 25 thí sinh và 6 trang hạng mục trên lasoong.com, đọc ngày 18/11/2026. Trang hạng mục chỉ hiện 12 thí sinh đầu.</li>
+        <li>Lượt xem hồ sơ: số lần xem trang thí sinh có tên thí sinh trong GA4.</li>
+        <li>Hoa hậu Việt Nam 2026: <a href="https://vnexpress.net/25-nguoi-dep-tranh-vuong-mien-hoa-hau-viet-nam-2026-5141856.html" target="_blank" rel="noopener">VnExpress</a>.</li>
+        <li>Doanh thu là số GA4, chưa đối soát với cổng thanh toán và còn lẫn giao dịch thử. Còn một nhóm truy cập Opera ở Hải Phòng bất thường, cùng bot và máy chủ nước ngoài; nguyên nhân các điểm này là suy luận từ số liệu, chưa được xác minh.</li>
+      </ul>
+    </details>
+  </div>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  var RAW={"facts": "key,label,value\nusers,Người dùng,139844\nsessions,Lượt truy cập,277872\nevents,Hành động ghi nhận,2638157\nvotes,Phiếu bình chọn của 25 thí sinh,708512\nfinalists,Thí sinh chung kết,25\ninterest,Lượt quan tâm của 25 thí sinh,36956\nviews25,Lượt xem hồ sơ của 25 thí sinh,53814\nrev_item,Doanh thu GA4 theo mặt hàng (triệu ₫),1246.9\nrev_event,Doanh thu GA4 theo đơn (triệu ₫),1080.6\nrev_hhvn,Doanh thu HHVN theo mặt hàng (triệu ₫),710.9\nrev_pack,Doanh thu gói bình chọn (triệu ₫),347.7\nrev_final,Doanh thu vé đêm chung kết (triệu ₫),358.0\nrev_semi,Doanh thu vé chung khảo (triệu ₫),5.1\nrev_test04,Vé thử nghiệm 04 (triệu ₫),499.0\nrev_test_other,Vé thử nghiệm khác (triệu ₫),7.7\nrev_concert,Concert Thanh Xuân (triệu ₫),29.3\nrev_gap,Chênh lệch hai cách tính doanh thu (triệu ₫),166.3\npack_count,Số gói bình chọn bán ra,997\nticket_final_count,Số vé đêm chung kết bán ra,306\npack1tr_share,Tỷ trọng GÓI 1TR trong doanh thu gói (%),90.3\nstd_share,Tỷ trọng vé STANDARD trong doanh thu vé (%),82.1\nshare_facebook,Tỷ trọng lượt truy cập từ Facebook (%),31.4\nshare_zalo,Tỷ trọng lượt truy cập từ Zalo (%),18.6\nshare_social,Tỷ trọng Facebook và Zalo (%),49.9\nshare_direct,Tỷ trọng truy cập trực tiếp (%),25.4\nshare_mobile,Người dùng điện thoại (%),86.8\nshare_ios,Người dùng iOS (%),64.1\nshare_fbapp,\"Phiên mở trong ứng dụng Facebook, Clarity (%)\",41.3\nshare_inapp,Người dùng trình duyệt trong ứng dụng (%),22.2\nshare_rev_desktop,Doanh thu GA4 từ máy tính (%),78.4\nshare_rev_mac,Doanh thu GA4 từ máy Mac (%),65.9\nmac_users,Người dùng máy Mac,2302\nshare_unattributed_rev,Doanh thu không rõ nguồn hoặc trực tiếp (%),97.0\nopera_users,Người dùng Opera ở Hải Phòng,776\nopera_new,Trong đó người dùng mới,5\nopera_events,Hành động của nhóm Opera,275124\nopera_event_share,Tỷ trọng hành động của nhóm Opera (%),10.4\nopera_key_share,Tỷ trọng hành động quan trọng của nhóm Opera (%),35.2\nbot_sessions,Phiên bot Clarity đã loại,4219\nbot_share,Tỷ trọng phiên bot (%),3.4\ncrawler_users,Người dùng ở 5 thành phố trung tâm dữ liệu,1241\ntracked_sessions,Lượt truy cập qua link theo dõi,120\ntracked_links,Số link theo dõi đã tạo,110\npress_engaged,Tỷ lệ ở lại của độc giả báo Thanh Niên (%),91.8\nqr_key,Tỷ lệ có hành động quan trọng từ mã QR (%),38.6\npaid_engaged,Tỷ lệ ở lại từ quảng cáo Facebook (%),26.8\npaid_sessions,Lượt truy cập từ quảng cáo,2531\nwinner_rank,Thứ hạng phiếu của Hoa hậu,7\nwinner_votes,Phiếu của Hoa hậu,29886\ntop_votes,Phiếu của người dẫn đầu,210572\ntop_views,Lượt xem hồ sơ của người dẫn đầu phiếu,797\ntop_share,Tỷ trọng phiếu của người dẫn đầu (%),29.7\ntop3_share,Tỷ trọng phiếu của 3 người đầu (%),51.0\ntop5_share,Tỷ trọng phiếu của 5 người đầu (%),64.6\ntop_interest,Lượt quan tâm cao nhất,6291\ntop_profile_views,Lượt xem hồ sơ cao nhất,8078\ncta_users,Người bấm nút trên trang thí sinh,58080\ncta_ok_users,Người có kết quả ghi nhận,21616\ncta_rate,Tỷ lệ có kết quả (%),37.2\nform_users,Người bắt đầu đăng ký,37593\nreg_users,Người đăng ký thành công,10309\nreg_rate,Tỷ lệ đăng ký xong (%),27.4\ncheckout_users,Người bắt đầu thanh toán,2283\nbuyers,Người mua,1527\nbuy_rate,Tỷ lệ mua xong (%),66.9\nclarity_sessions,Phiên Clarity 90 ngày,121499\nclarity_users,Người dùng Clarity 90 ngày,78825\nperf,Điểm hiệu năng,74\nlcp,Thời gian hiện nội dung chính (giây),2.9\ninp,\"Độ trễ khi chạm, bấm (ms)\",430\ncls,Độ xô lệch bố cục,0.043\njs_share,Phiên gặp lỗi kỹ thuật (%),11.5\nzalo_err,Lỗi do bộ nhúng Zalo (%),91.4\nquick_back,Phiên thoát nhanh (%),9.8\ndead_click,Phiên bấm mà không có phản hồi (%),4.1\nnodata_days,Số ngày đầu mùa thi không có dữ liệu web,27\nhanoi_share,Người dùng ở Hà Nội (%),53.0\nhaiphong_keyshare,Hành động quan trọng ở Hải Phòng (%),45.6\nkey_events,Hành động quan trọng,123900\n", "truy_cap": "level,name,group,sessions,engagement_rate,revenue_m\nnhom,Facebook,Mạng xã hội,87192,74.0,\nnhom,Truy cập trực tiếp,Trực tiếp,70624,63.1,\nnhom,Zalo,Mạng xã hội,51585,72.3,\nnhom,Không xác định nguồn,Không xác định,25994,0.02,\nnhom,\"Tìm kiếm (Google, Bing, Cốc Cốc)\",Tìm kiếm,16731,74.9,\nnhom,Báo chí và đối tác,Giới thiệu,14190,82.7,\nnhom,Nguồn khác,Khác,11556,,\nnguon,Báo Thanh Niên,Giới thiệu,6351,91.8,\nnguon,Mã QR,Giới thiệu,308,83.1,\nnguon,Facebook (lm.facebook.com),Mạng xã hội,18596,80.2,\nnguon,Facebook (l.facebook.com),Mạng xã hội,13433,79.5,\nnguon,Báo Tiền Phong,Giới thiệu,2421,76.0,\nnguon,hhvn.com.vn,Giới thiệu,3175,75.9,\nnguon,Google,Tìm kiếm,15936,74.8,\nnguon,Facebook (facebook.com),Mạng xã hội,45205,74.4,\nnguon,Zalo,Mạng xã hội,50740,72.3,\nnguon,Truy cập trực tiếp,Trực tiếp,70624,63.1,\nnguon,Facebook (m.facebook.com),Mạng xã hội,7427,62.1,\nnguon,Quảng cáo Facebook,Quảng cáo,2524,26.8,\nnguon,Không xác định nguồn,Không xác định,25994,0.02,\nkenh,Mạng xã hội,Mạng xã hội,138365,73.8,0.4\nkenh,Truy cập trực tiếp,Trực tiếp,70624,63.1,506.1\nkenh,Tìm kiếm,Tìm kiếm,16505,75.5,5.0\nkenh,Website giới thiệu,Giới thiệu,16362,80.7,26.6\nkenh,Quảng cáo mạng xã hội,Quảng cáo,2531,26.8,0\nkenh,Không xác định nguồn,Không xác định,26185,0.6,542.5\n", "giai_doan": "phase,period,label,sessions,revenue_m,social,direct,search,referral,paid,unassigned\n1,01/06–05/09,\"Tuyển sinh, sơ khảo, nhà chung\",119086,533.5,47910,42032,8617,13317,0,7298\n2,06/09–19/09,\"Mở bình chọn \"\"Và Bạn Xứng Đáng\"\"\",52710,0.1,34933,10005,1827,526,0,5178\n3,20/09–16/10,Chung khảo,55875,5.1,31632,8654,3080,925,0,10853\n4,17/10–06/11,\"Bình chọn 5 hạng mục, bán vé chung kết\",38627,437.1,21522,8106,2651,1490,2473,2069\n5,07/11–18/11,Đêm chung kết và sau đó,4538,104.8,2029,1262,747,185,52,289\n", "thiet_bi": "dim,name,users,engagement_rate,revenue_m\nthiet_bi,Điện thoại,121357,67.4,232.9\nthiet_bi,Máy tính,19683,48.8,847.4\nthiet_bi,Máy tính bảng,544,68.9,0.3\nhe_dieu_hanh,iOS,89678,66.5,202.5\nhe_dieu_hanh,Android,32628,71.8,30.7\nhe_dieu_hanh,Windows,17036,46.7,132.0\nhe_dieu_hanh,macOS,2302,68.5,712.3\nhe_dieu_hanh,Linux,322,66.3,0\ntrinh_duyet,Safari,62069,64.2,152.0\ntrinh_duyet,Chrome,43676,69.6,853.6\ntrinh_duyet,Safari trong ứng dụng,26540,76.8,65.8\ntrinh_duyet,Android WebView,4448,74.6,4.6\ntrinh_duyet,Edge,3173,74.9,0.5\ntrinh_duyet,Samsung Internet,1864,46.8,0.8\ntrinh_duyet,Opera,904,3.5,0\ntrinh_duyet,Firefox,199,63.3,0\nclarity,Ứng dụng Facebook,50210,,\nclarity,Safari điện thoại,36056,,\nclarity,Chrome điện thoại,19086,,\nclarity,Chrome máy tính,9402,,\nclarity,Khác,6778,,\nthanh_pho,Hà Nội,74132,69.8,723.1\nthanh_pho,TP. Hồ Chí Minh,19942,61.9,97.6\nthanh_pho,Hải Phòng,14867,45.2,213.0\nthanh_pho,Đà Nẵng,4059,64.6,0.6\nthanh_pho,Cần Thơ,2424,68.3,0.7\nthanh_pho,Hoa Lư (Ninh Bình),1341,70.5,0.05\nthanh_pho,Cao Lãnh (Đồng Tháp),1119,78.9,0\nthanh_pho,Nha Trang,788,65.9,0.05\nthanh_pho,Tuy Hòa,591,83.9,0\nthanh_pho,Không xác định,30418,74.8,40.9\n", "thi_sinh": "id,name,sbd,votes,interest,views,finalist,winner\n28,Vũ Hồng Hạnh,378,210572,724,797,1,0\n141,Nguyễn Thị Thuý Linh,856,78350,4794,2911,1,0\n144,Trần Xuân Khánh Linh,818,72507,1133,1118,1,0\n204,Phạm Lê Ái Linh,826,52718,1795,8078,1,0\n114,Đinh Diệu Anh,186,43198,654,1280,1,0\n201,Hoàng Thị Hà Phương,693,40614,643,721,1,0\n39,Nguyễn Yến Trang,362,29886,808,2532,1,1\n46,Bùi Mai Linh,510,26003,1547,1927,1,0\n57,Đinh Hoàng Gia Linh,116,25916,6291,4462,1,0\n32,Phạm Vân Hà,638,23462,4262,3620,1,0\n31,Lê Phương Nghi,031,17871,2961,2470,1,0\n253,Nguyễn Thái Anh Thư,582,16117,869,3878,1,0\n112,Nguyễn Thục Uyên Nhi,602,13366,833,1958,1,0\n123,Tạ Thị Hoa,618,10880,1915,3159,1,0\n198,Vũ Thị Khánh Vi,090,10712,628,848,1,0\n81,Bùi Minh Phương,082,8434,610,1943,1,0\n250,Mai Thị Yến Nhi,076,6765,634,1561,1,0\n216,Nguyễn Thị Hoa,240,5867,1592,3088,1,0\n53,Nguyễn Hồng Hạ Nghi,982,5842,489,839,1,0\n40,Lưu Phương Anh,290,5089,484,1007,1,0\n36,Nguyễn Thị Kim Châu,168,3218,507,1141,1,0\n26,Đặng Thị Ngọc Lan,308,614,823,3046,1,0\n106,Trịnh Ngọc Huyền,864,200,639,476,1,0\n41,Gouband Lisa,124,193,657,463,1,0\n100,Nguyễn Ngọc Thảo Nguyên,450,118,664,491,1,0\n99,Thẩm Khánh Ly,,,,6578,0,0\n166,Nguyễn Thị Quỳnh Anh,,,,5589,0,0\n,Đinh Ngọc Châu,,,,3049,0,0\n", "hang_muc": "category,category_total,rank,name,votes\n\"\"\"Và Bạn Xứng Đáng\"\"\",225679,1,Vũ Hồng Hạnh,94689\n\"\"\"Và Bạn Xứng Đáng\"\"\",225679,2,Nguyễn Thị Thuý Linh,23937\n\"\"\"Và Bạn Xứng Đáng\"\"\",225679,3,Đinh Hoàng Gia Linh,15471\n\"\"\"Và Bạn Xứng Đáng\"\"\",225679,4,Phạm Lê Ái Linh,14070\n\"\"\"Và Bạn Xứng Đáng\"\"\",225679,5,Bùi Mai Linh,13231\nNgười đẹp được bình chọn nhiều nhất,150472,1,Vũ Hồng Hạnh,72606\nNgười đẹp được bình chọn nhiều nhất,150472,2,Phạm Lê Ái Linh,25798\nNgười đẹp được bình chọn nhiều nhất,150472,3,Hoàng Thị Hà Phương,22233\nNgười đẹp được bình chọn nhiều nhất,150472,4,Nguyễn Thị Thuý Linh,17823\nNgười đẹp được bình chọn nhiều nhất,150472,5,Phạm Vân Hà,2782\nĐại sứ Nhân ái,139232,1,Trần Xuân Khánh Linh,59897\nĐại sứ Nhân ái,139232,2,Đinh Diệu Anh,19347\nĐại sứ Nhân ái,139232,3,Vũ Hồng Hạnh,13511\nĐại sứ Nhân ái,139232,4,Nguyễn Thái Anh Thư,13417\nĐại sứ Nhân ái,139232,5,Bùi Mai Linh,12259\nĐại sứ Truyền thông và Nghệ thuật,66670,1,Nguyễn Thị Thuý Linh,25444\nĐại sứ Truyền thông và Nghệ thuật,66670,2,Nguyễn Yến Trang,14002\nĐại sứ Truyền thông và Nghệ thuật,66670,3,Vũ Thị Khánh Vi,9938\nĐại sứ Truyền thông và Nghệ thuật,66670,4,Đinh Hoàng Gia Linh,7329\nĐại sứ Truyền thông và Nghệ thuật,66670,5,Hoàng Thị Hà Phương,5861\nĐại sứ Thời trang và Thể thao,64553,1,Vũ Hồng Hạnh,16523\nĐại sứ Thời trang và Thể thao,64553,2,Nguyễn Yến Trang,13123\nĐại sứ Thời trang và Thể thao,64553,3,Đinh Diệu Anh,12155\nĐại sứ Thời trang và Thể thao,64553,4,Nguyễn Thị Thuý Linh,11113\nĐại sứ Thời trang và Thể thao,64553,5,Phạm Vân Hà,4658\nĐại sứ Du lịch và Môi trường,43234,1,Vũ Hồng Hạnh,13211\nĐại sứ Du lịch và Môi trường,43234,2,Phạm Lê Ái Linh,12334\nĐại sứ Du lịch và Môi trường,43234,3,Lê Phương Nghi,5152\nĐại sứ Du lịch và Môi trường,43234,4,Hoàng Thị Hà Phương,4983\nĐại sứ Du lịch và Môi trường,43234,5,Tạ Thị Hoa,4390\n", "doanh_thu": "group,item,qty,revenue_m,kind\nGói bình chọn,GÓI 1TR,314,314.0,hhvn\nGói bình chọn,GÓI 100K,299,29.9,hhvn\nGói bình chọn,GÓI 10K,384,3.84,hhvn\nVé đêm chung kết,Vé STANDARD,294,294.0,hhvn\nVé đêm chung kết,Vé VVIP,4,40.0,hhvn\nVé đêm chung kết,Vé PREMIUM,4,12.0,hhvn\nVé đêm chung kết,Vé VIP,2,10.0,hhvn\nVé đêm chung kết,Vé STANDARD (tên rút gọn),2,2.0,hhvn\nVé chung khảo,Vé chung khảo (4 hạng),18,5.112,hhvn\nGiao dịch thử,Vé thử nghiệm 04,1,499.0,test\nGiao dịch thử,Vé thử nghiệm khác, ,7.72,test\nSự kiện khác,Concert Thanh Xuân,568,29.325,other\n", "hanh_vi": "funnel,step,order,users\nQuan tâm và bình chọn,Bấm nút trên trang thí sinh,1,58080\nQuan tâm và bình chọn,Có kết quả ghi nhận,2,21616\nĐăng ký,Bắt đầu điền form,1,37593\nĐăng ký,Đăng ký thành công,2,10309\nMua hàng,Bắt đầu thanh toán,1,2283\nMua hàng,Nhập thông tin thanh toán,2,1855\nMua hàng,Mua thành công,3,1527\n"};
+  var CACHE={};
+  function get(id){
+    if(!CACHE[id]){var t=RAW[id];CACHE[id]=t==null?null:d3.csvParse(t);}
+    var r=CACHE[id];
+    return r?{status:'ok',data:r,columns:r.columns}:{status:'missing',data:[],columns:[]};
+  }
+  var draws=[];
+  window.dash={
+    data:get,
+    draw:function(name,fn){draws.push([name,fn]);run(name,fn);},
+    onData:function(fn){fn();window.addEventListener('resize',debounced(fn));},
+    colors:['#c2185b','#6a1b9a','#00897b','#ff8a65','#c9a227','#2b7bb9']
+  };
+  function run(name,fn){document.querySelectorAll('[data-draw="'+name+'"]').forEach(function(el){try{fn(el);}catch(e){console.error(name,e);}});}
+  function debounced(fn){var t;return function(){clearTimeout(t);t=setTimeout(fn,150);};}
+  var lastW=window.innerWidth;
+  window.addEventListener('resize',debounced(function(){
+    if(window.innerWidth===lastW)return;lastW=window.innerWidth;
+    draws.forEach(function(d){if(d[0]!=='fact')run(d[0],d[1]);});
+  }));
+})();
+</script>
+<script>
+(function () {
+  const L = d3.formatLocale({ decimal: ',', thousands: '.', grouping: [3], currency: ['', ''] });
+  const F = { int: L.format(',.0f'), d1: L.format(',.1f'), d2: L.format(',.2f'), d3: L.format(',.3f') };
+  const PAL = {
+    rose: ['#c2185b', '#6a3fb5', '#0f9d8e', '#e08a00', '#ec6b92', '#5f6b8f'],
+    violet: ['#6a3fb5', '#c2185b', '#0f9d8e', '#e08a00', '#2a5fd0', '#5f6b8f'],
+    teal: ['#0f9d8e', '#c2185b', '#6a3fb5', '#e08a00', '#2a5fd0', '#5f6b8f'],
+    peach: ['#e5641f', '#c2185b', '#6a3fb5', '#0f9d8e', '#d99a00', '#5f6b8f'],
+    gold: ['#c98a00', '#c2185b', '#0f9d8e', '#6a3fb5', '#e5641f', '#5f6b8f'],
+    sky: ['#2a5fd0', '#c2185b', '#0f9d8e', '#e08a00', '#6a3fb5', '#5f6b8f'],
+    wine: ['#ffc857', '#ff7aa8', '#4fd1c5', '#b69cff', '#ff9f6b', '#9aa3c7'],
+    navy: ['#7fe3d4', '#ffc857', '#ff7aa8', '#b69cff', '#6fa8ff', '#9aa3c7']
+  };
+  function num(v) { const n = parseFloat(v); return isFinite(n) ? n : null; }
+  function fmt(v, k) { const n = num(v); return n === null ? '—' : (F[k] || F.int)(n); }
+  function P(el) { const s = el && el.closest ? el.closest('[data-pal]') : null; return PAL[(s && s.getAttribute('data-pal')) || 'rose']; }
+  function C(i, el) { const p = P(el); return p[i % p.length]; }
+  function onFill(c) { const h = d3.hcl(c); return h.l > 62 ? '#2a1020' : '#ffffff'; }
+  function rows(id) { const d = dash.data(id); return d.status === 'ok' && Array.isArray(d.data) ? d.data : null; }
+  function empty(el, ids) {
+    el.replaceChildren();
+    const failed = ids.some((id) => dash.data(id).status === 'error');
+    const p = document.createElement('div');
+    p.className = 'hv-empty';
+    p.textContent = failed ? 'Không tải được dữ liệu' : '—';
+    el.appendChild(p);
+  }
+  function svg(el, w, h, label) {
+    return d3.select(el).append('svg').attr('class', 'hv-svg').attr('width', '100%')
+      .attr('viewBox', `0 0 ${w} ${h}`).attr('role', 'img').attr('aria-label', label);
+  }
+  function textW(s, strs, cls) {
+    const g = s.append('g');
+    let m = 0;
+    strs.forEach((t) => { const n = g.append('text').attr('class', cls).text(t).node(); m = Math.max(m, n.getComputedTextLength()); });
+    g.remove();
+    return m;
+  }
+  function fit(node, maxW) {
+    if (node.getComputedTextLength() <= maxW) return;
+    let s = node.textContent;
+    while (s.length > 2 && node.getComputedTextLength() > maxW) { s = s.slice(0, -1); node.textContent = s + '…'; }
+  }
+  function tip(el) {
+    const t = document.createElement('div');
+    t.className = 'hv-tip';
+    t.hidden = true;
+    el.appendChild(t);
+    return {
+      show(ev, lines) {
+        t.replaceChildren();
+        lines.forEach((s, i) => { const d = document.createElement('div'); if (i === 0) d.className = 'hv-tip-t'; d.textContent = s; t.appendChild(d); });
+        t.hidden = false;
+        const r = el.getBoundingClientRect();
+        let x = ev.clientX - r.left + 14, y = ev.clientY - r.top + 14;
+        if (x + t.offsetWidth > r.width) x = Math.max(0, ev.clientX - r.left - t.offsetWidth - 14);
+        if (y + t.offsetHeight > r.height) y = Math.max(0, ev.clientY - r.top - t.offsetHeight - 14);
+        t.style.left = x + 'px';
+        t.style.top = y + 'px';
+      },
+      hide() { t.hidden = true; }
+    };
+  }
+  function fact(f, key) { const r = f && f.find((x) => x.key === key); return r ? num(r.value) : null; }
+  function hbarStacked(el, items, o, W) {
+    const rowH = 42;
+    const s = svg(el, W, items.length * rowH + 4, o.aria);
+    const vw = textW(s, items.map((d) => d.valueText), 'hv-val') + 10;
+    const max = o.max || d3.max(items, (d) => d.value) || 1;
+    const x = d3.scaleLinear().domain([0, max]).range([0, Math.max(40, W - vw - 4)]);
+    const t = tip(el);
+    const g = s.selectAll('g.r').data(items).join('g').attr('class', 'r').attr('transform', (d, i) => `translate(0,${i * rowH})`);
+    g.append('text').attr('class', 'hv-lab').attr('x', 0).attr('y', 12).text((d) => d.label).each(function () { fit(this, W); });
+    g.append('rect').attr('class', 'bar').attr('x', 0).attr('y', 19).attr('height', 16).attr('rx', 4)
+      .attr('width', (d) => Math.max(2, x(Math.max(0, d.value)))).style('fill', (d) => d.color).style('transition-delay', (d, i) => i * 50 + 'ms');
+    g.append('text').attr('class', 'hv-val').attr('x', (d) => Math.max(2, x(Math.max(0, d.value))) + 6).attr('y', 27).attr('dy', '0.35em').text((d) => d.valueText);
+    g.append('rect').attr('width', W).attr('height', rowH).style('fill', 'transparent')
+      .on('pointermove pointerdown', (ev, d) => t.show(ev, d.tip)).on('pointerleave', () => t.hide());
+  }
+  function hbar(el, items, o) {
+    el.replaceChildren();
+    const W = Math.max(240, Math.floor(el.clientWidth || 600));
+    if (W < 400) return hbarStacked(el, items, o, W);
+    const rowH = o.rowH || 30;
+    const s = svg(el, W, items.length * rowH + 4, o.aria);
+    const lw = Math.min(W * 0.44, textW(s, items.map((d) => d.label), 'hv-lab') + 12);
+    const vw = textW(s, items.map((d) => d.valueText), 'hv-val') + 10;
+    const max = o.max || d3.max(items, (d) => d.value) || 1;
+    const x = d3.scaleLinear().domain([0, max]).range([0, Math.max(40, W - lw - vw - 4)]);
+    const t = tip(el);
+    const g = s.selectAll('g.r').data(items).join('g').attr('class', 'r').attr('transform', (d, i) => `translate(0,${i * rowH})`);
+    g.append('text').attr('class', 'hv-lab').attr('x', lw - 10).attr('y', rowH / 2).attr('dy', '0.35em').attr('text-anchor', 'end').text((d) => d.label).each(function () { fit(this, lw - 12); });
+    g.append('rect').attr('class', 'bar').attr('x', lw).attr('y', rowH * 0.2).attr('height', rowH * 0.6).attr('rx', 4)
+      .attr('width', (d) => Math.max(2, x(Math.max(0, d.value)))).style('fill', (d) => d.color).style('transition-delay', (d, i) => i * 50 + 'ms');
+    g.append('text').attr('class', 'hv-val').attr('x', (d) => lw + Math.max(2, x(Math.max(0, d.value))) + 6).attr('y', rowH / 2).attr('dy', '0.35em').text((d) => d.valueText);
+    g.append('rect').attr('width', W).attr('height', rowH).style('fill', 'transparent')
+      .on('pointermove pointerdown', (ev, d) => t.show(ev, d.tip)).on('pointerleave', () => t.hide());
+  }
+  function stack100(el, segs, o) {
+    el.replaceChildren();
+    const W = Math.max(280, Math.floor(el.clientWidth || 600));
+    const total = d3.sum(segs, (d) => d.value) || 1;
+    const big = segs.filter((d) => d.value / total >= (o.minLabel || 0.02));
+    const s = svg(el, W, 50 + big.length * 24, o.aria);
+    const x = d3.scaleLinear().domain([0, total]).range([0, W]);
+    const t = tip(el);
+    let acc = 0;
+    segs.forEach((d) => { d.x0 = acc; acc += d.value; d.x1 = acc; });
+    s.selectAll('rect.bar').data(segs).join('rect').attr('class', 'bar')
+      .attr('x', (d) => x(d.x0)).attr('y', 4).attr('height', 34)
+      .attr('width', (d) => Math.max(0, x(d.x1) - x(d.x0) - 2)).attr('rx', 4).style('fill', (d) => d.color)
+      .style('transition-delay', (d, i) => i * 80 + 'ms')
+      .on('pointermove pointerdown', (ev, d) => t.show(ev, [d.label, fmt(d.value / total * 100, 'd1') + '%', d.extra || ''].filter(Boolean)))
+      .on('pointerleave', () => t.hide());
+    const lg = s.selectAll('g.lb').data(big).join('g').attr('class', 'lb').attr('transform', (d, i) => `translate(0,${50 + i * 24})`);
+    lg.append('rect').attr('width', 12).attr('height', 12).attr('y', 1).attr('rx', 3).style('fill', (d) => d.color);
+    lg.append('text').attr('class', 'hv-lab').attr('x', 20).attr('y', 7).attr('dy', '0.35em').text((d) => `${d.label}: ${fmt(d.value / total * 100, 'd1')}%`);
+  }
+  window.hv = { fmt, num, P, C, onFill, rows, empty, svg, textW, fit, tip, fact, hbar, stack100, F };
+})();
+</script>
+
+<script>
+/* Static wiring: swatches, scroll reveal, chart growth, sticky-stage steps, chapter bar. Writes only class and style. */
+(function () {
+  const root = document.getElementById('hv-top');
+  if (!root) return;
+  document.querySelectorAll('.hv .hv-sw[data-c]').forEach((e) => { e.style.background = hv.C(+e.getAttribute('data-c'), e); });
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reduce && 'IntersectionObserver' in window) root.classList.add('hv-js');
+  if (!('IntersectionObserver' in window)) return;
+
+  const rv = new IntersectionObserver((es) => {
+    es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); rv.unobserve(e.target); } });
+  }, { root: document, rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
+  root.querySelectorAll('.hv-rv').forEach((e) => rv.observe(e));
+  // Fallback for tabs where intersection callbacks are delayed: reveal what is already on screen.
+  const revealVisible = () => {
+    const vh = window.innerHeight || 800;
+    root.querySelectorAll('.hv-rv:not(.in)').forEach((e) => { const r = e.getBoundingClientRect(); if (r.top < vh * 0.95 && r.bottom > 0) { e.classList.add('in'); rv.unobserve(e); } });
+    root.querySelectorAll('.hv-chart:not(.in)').forEach((e) => { const r = e.getBoundingClientRect(); const layer = e.closest('.hv-layer'); if (layer && getComputedStyle(layer).position === 'absolute' && !layer.classList.contains('on')) return; if (r.top < vh * 0.95 && r.bottom > 0) e.classList.add('in'); });
+  };
+  [200, 900, 2200].forEach((ms) => setTimeout(revealVisible, ms));
+  document.addEventListener('scroll', () => { window.requestAnimationFrame(revealVisible); }, { capture: true, passive: true });
+
+  const isStage = (layer) => layer && getComputedStyle(layer).position === 'absolute';
+  const grow = new IntersectionObserver((es) => {
+    es.forEach((e) => {
+      if (!e.isIntersecting) return;
+      const layer = e.target.closest('.hv-layer');
+      if (layer && isStage(layer) && !layer.classList.contains('on')) return;
+      e.target.classList.add('in');
+      grow.unobserve(e.target);
+    });
+  }, { root: document, rootMargin: '0px 0px -6% 0px', threshold: 0.1 });
+  root.querySelectorAll('.hv-chart').forEach((e) => grow.observe(e));
+
+  function activate(scrolly, l) {
+    scrolly.querySelectorAll('.hv-step').forEach((s) => s.classList.toggle('on', s.getAttribute('data-l') === l));
+    scrolly.querySelectorAll('.hv-layer').forEach((s) => {
+      const on = s.getAttribute('data-l') === l;
+      s.classList.toggle('on', on);
+      if (on) s.querySelectorAll('.hv-chart').forEach((c) => c.classList.add('in'));
+    });
+  }
+  root.querySelectorAll('.hv-scrolly').forEach((sc) => {
+    const io = new IntersectionObserver((es) => {
+      es.forEach((e) => { if (e.isIntersecting) activate(sc, e.target.getAttribute('data-l')); });
+    }, { root: document, rootMargin: '-42% 0px -42% 0px', threshold: 0 });
+    sc.querySelectorAll('.hv-step').forEach((s) => io.observe(s));
+    sc.querySelectorAll('.hv-layer.on .hv-chart').forEach((c) => c.classList.add('in'));
+  });
+
+  const chips = Array.from(root.querySelectorAll('.hv-chip'));
+  const nav = root.querySelector('.hv-chips');
+  const so = new IntersectionObserver((es) => {
+    es.forEach((e) => {
+      if (!e.isIntersecting) return;
+      const id = e.target.getAttribute('data-ch');
+      chips.forEach((c) => {
+        const on = c.getAttribute('data-ch') === id;
+        c.classList.toggle('on', on);
+        if (on && nav) nav.scrollLeft = c.offsetLeft - nav.clientWidth / 2 + c.clientWidth / 2;
+      });
+    });
+  }, { root: document, rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+  root.querySelectorAll('.hv-scene[data-ch]').forEach((s) => so.observe(s));
+
+  const prog = document.getElementById('hv-prog');
+  function onScroll() {
+    if (!prog) return;
+    const r = root.getBoundingClientRect();
+    const span = Math.max(1, r.height - window.innerHeight);
+    const p = Math.min(1, Math.max(0, -r.top / span));
+    prog.style.width = (p * 100).toFixed(1) + '%';
+  }
+  document.addEventListener('scroll', onScroll, { capture: true, passive: true });
+  onScroll();
+})();
+</script>
+
+<script>
+dash.draw('fact', (el) => {
+  const f = hv.rows('facts');
+  if (!f) { el.textContent = '—'; return; }
+  const key = decodeURIComponent((el.getAttribute('data-where') || '').replace(/^key=/, ''));
+  el.textContent = hv.fmt(hv.fact(f, key), el.getAttribute('data-fmt'));
+});
+
+const HV_CH = [['social', 'Mạng xã hội'], ['direct', 'Truy cập trực tiếp'], ['search', 'Tìm kiếm'], ['referral', 'Website giới thiệu'], ['paid', 'Quảng cáo'], ['unassigned', 'Không xác định nguồn']];
+
+dash.draw('ch-phase', (el) => {
+  const r = hv.rows('giai_doan');
+  if (!r) return hv.empty(el, ['giai_doan']);
+  el.replaceChildren();
+  const W = Math.max(280, Math.floor(el.clientWidth || 600));
+  const rowH = 70;
+  const s = hv.svg(el, W, r.length * rowH, 'Tỷ trọng nguồn truy cập trong 5 giai đoạn của mùa thi');
+  const vals = r.map((p) => hv.fmt(p.sessions, 'int') + ' lượt');
+  const vw = hv.textW(s, vals, 'hv-val') + 12;
+  const bw = Math.max(80, W - vw);
+  const t = hv.tip(el);
+  r.forEach((p, i) => {
+    const g = s.append('g').attr('transform', `translate(0,${i * rowH})`);
+    g.append('text').attr('class', 'hv-lab').attr('x', 0).attr('y', 14).text(`Giai đoạn ${p.phase} · ${p.period} · ${p.label}`).each(function () { hv.fit(this, W); });
+    const segs = HV_CH.map(([k, n], j) => ({ k, n, v: hv.num(p[k]) || 0, c: hv.C(j, el) }));
+    const tot = d3.sum(segs, (d) => d.v) || 1;
+    let acc = 0;
+    segs.forEach((d, j) => {
+      const x0 = acc / tot * bw; acc += d.v; const x1 = acc / tot * bw;
+      if (d.v <= 0) return;
+      g.append('rect').attr('class', 'bar').attr('x', x0).attr('y', 24).attr('height', 32).attr('rx', 4).attr('width', Math.max(1, x1 - x0 - 2)).style('fill', d.c)
+        .style('transition-delay', (i * 120 + j * 60) + 'ms')
+        .on('pointermove pointerdown', (ev) => t.show(ev, [`Giai đoạn ${p.phase} · ${d.n}`, hv.fmt(d.v, 'int') + ' lượt truy cập', hv.fmt(d.v / tot * 100, 'd1') + '% giai đoạn']))
+        .on('pointerleave', () => t.hide());
+      if (x1 - x0 > 40) g.append('text').attr('class', 'hv-val').attr('x', x0 + 7).attr('y', 40).attr('dy', '0.35em').attr('pointer-events', 'none').style('fill', hv.onFill(d.c)).text(hv.fmt(d.v / tot * 100, 'int') + '%');
+    });
+    g.append('text').attr('class', 'hv-val').attr('x', W).attr('y', 40).attr('dy', '0.35em').attr('text-anchor', 'end').text(vals[i]);
+  });
+});
+
+dash.draw('ch-family', (el) => {
+  const r = hv.rows('truy_cap'), f = hv.rows('facts');
+  if (!r || !f) return hv.empty(el, ['truy_cap', 'facts']);
+  const total = hv.fact(f, 'sessions') || 1;
+  const items = r.filter((x) => x.level === 'nhom').map((x) => ({ n: x.name, v: hv.num(x.sessions) || 0, g: x.group }))
+    .sort((a, b) => b.v - a.v)
+    .map((x) => ({
+      label: x.n, value: x.v,
+      color: x.g === 'Mạng xã hội' ? hv.C(0, el) : 'var(--barmute)',
+      valueText: `${hv.fmt(x.v, 'int')} · ${hv.fmt(x.v / total * 100, 'd1')}%`,
+      tip: [x.n, hv.fmt(x.v, 'int') + ' lượt truy cập', hv.fmt(x.v / total * 100, 'd1') + '% tổng lượt truy cập']
+    }));
+  hv.hbar(el, items, { aria: 'Lượt truy cập theo nhóm nguồn', rowH: 34 });
+});
+
+dash.draw('ch-stay', (el) => {
+  const r = hv.rows('truy_cap');
+  if (!r) return hv.empty(el, ['truy_cap']);
+  const items = r.filter((x) => x.level === 'nguon').map((x) => ({ n: x.name, e: hv.num(x.engagement_rate) || 0, s: hv.num(x.sessions) || 0 })).sort((a, b) => b.e - a.e);
+  el.replaceChildren();
+  const W = Math.max(280, Math.floor(el.clientWidth || 600));
+  const rowH = 28;
+  const s = hv.svg(el, W, items.length * rowH + 4, 'Tỷ lệ ở lại tương tác theo nguồn truy cập');
+  const lw = Math.min(W * 0.46, hv.textW(s, items.map((d) => d.n), 'hv-lab') + 12);
+  const vw = hv.textW(s, ['100,0%'], 'hv-val') + 12;
+  const x = d3.scaleLinear().domain([0, 100]).range([lw, Math.max(lw + 40, W - vw)]);
+  const t = hv.tip(el);
+  const col = (e) => e >= 70 ? hv.C(0, el) : (e >= 40 ? 'var(--barmute)' : 'var(--bad)');
+  const g = s.selectAll('g.r').data(items).join('g').attr('transform', (d, i) => `translate(0,${i * rowH})`);
+  g.append('text').attr('class', 'hv-lab').attr('x', lw - 10).attr('y', rowH / 2).attr('dy', '0.35em').attr('text-anchor', 'end').text((d) => d.n).each(function () { hv.fit(this, lw - 12); });
+  g.append('rect').attr('class', 'bar').attr('x', lw).attr('y', rowH / 2 - 3).attr('height', 6).attr('rx', 3).attr('width', (d) => Math.max(2, x(d.e) - lw)).style('fill', (d) => col(d.e)).style('transition-delay', (d, i) => i * 40 + 'ms');
+  g.append('circle').attr('class', 'dot').attr('cx', (d) => x(d.e)).attr('cy', rowH / 2).attr('r', 7).style('fill', (d) => col(d.e)).style('stroke', 'var(--card)').style('stroke-width', 2).style('transition-delay', (d, i) => 300 + i * 40 + 'ms');
+  g.append('text').attr('class', 'hv-val').attr('x', (d) => x(d.e) + 12).attr('y', rowH / 2).attr('dy', '0.35em').text((d) => hv.fmt(d.e, 'd1') + '%');
+  g.append('rect').attr('width', W).attr('height', rowH).style('fill', 'transparent')
+    .on('pointermove pointerdown', (ev, d) => t.show(ev, [d.n, hv.fmt(d.e, 'd1') + '% ở lại tương tác', hv.fmt(d.s, 'int') + ' lượt truy cập']))
+    .on('pointerleave', () => t.hide());
+});
+
+dash.draw('ch-ring', (el) => {
+  const f = hv.rows('facts');
+  if (!f) return hv.empty(el, ['facts']);
+  const rings = [
+    { n: 'Điện thoại', v: hv.fact(f, 'share_mobile') },
+    { n: 'iPhone, iPad', v: hv.fact(f, 'share_ios') },
+    { n: 'Mở trong ứng dụng Facebook', v: hv.fact(f, 'share_fbapp') },
+    { n: 'Trình duyệt trong ứng dụng', v: hv.fact(f, 'share_inapp') }
+  ].filter((x) => x.v !== null);
+  el.replaceChildren();
+  const W = Math.max(260, Math.floor(el.clientWidth || 400));
+  const S = Math.min(W, 420);
+  const R = S / 2 - 6, w = 22, gap = 8;
+  const s = hv.svg(el, S, S, 'Các tỷ lệ người dùng điện thoại, iOS, ứng dụng Facebook và trình duyệt trong ứng dụng');
+  const g = s.append('g').attr('transform', `translate(${S / 2},${S / 2})`);
+  const sweep = Math.PI * 1.5;
+  const t = hv.tip(el);
+  rings.forEach((d, i) => {
+    const ro = R - i * (w + gap), ri = ro - w;
+    const track = d3.arc().innerRadius(ri).outerRadius(ro).startAngle(0).endAngle(sweep).cornerRadius(w / 2);
+    const val = d3.arc().innerRadius(ri).outerRadius(ro).startAngle(0).endAngle(sweep * d.v / 100).cornerRadius(w / 2);
+    g.append('path').attr('d', track()).style('fill', 'var(--barmute)').style('opacity', 0.45);
+    g.append('path').attr('class', 'arc').attr('d', val()).style('fill', hv.C(i, el)).style('transition-delay', i * 150 + 'ms')
+      .on('pointermove pointerdown', (ev) => t.show(ev, [d.n, hv.fmt(d.v, 'd1') + '%']))
+      .on('pointerleave', () => t.hide());
+    g.append('text').attr('class', 'hv-lab').attr('x', -8).attr('y', -(ro - w / 2)).attr('dy', '0.35em').attr('text-anchor', 'end').style('font-size', '12px').text(`${d.n} ${hv.fmt(d.v, 'd1')}%`);
+  });
+});
+
+dash.draw('ch-fly', (el) => {
+  const r = hv.rows('thiet_bi'), f = hv.rows('facts');
+  if (!r || !f) return hv.empty(el, ['thiet_bi', 'facts']);
+  const dim = el.getAttribute('data-dim');
+  const U = hv.fact(f, 'users') || 1, R = hv.fact(f, 'rev_event') || 1;
+  const items = r.filter((x) => x.dim === dim).map((x) => ({ n: x.name, u: (hv.num(x.users) || 0) / U * 100, rv: (hv.num(x.revenue_m) || 0) / R * 100, users: hv.num(x.users), rev: hv.num(x.revenue_m) }));
+  el.replaceChildren();
+  const W = Math.max(280, Math.floor(el.clientWidth || 600));
+  const rowH = 46;
+  const s = hv.svg(el, W, items.length * rowH + 4, 'Tỷ trọng người dùng so với tỷ trọng doanh thu');
+  const lw = Math.min(W * 0.34, hv.textW(s, items.map((d) => d.n), 'hv-lab') + 12);
+  const vw = hv.textW(s, ['100,0%'], 'hv-val') + 10;
+  const x = d3.scaleLinear().domain([0, 100]).range([0, Math.max(40, W - lw - vw)]);
+  const t = hv.tip(el);
+  const g = s.selectAll('g.r').data(items).join('g').attr('transform', (d, i) => `translate(0,${i * rowH})`);
+  g.append('text').attr('class', 'hv-lab').attr('x', lw - 10).attr('y', rowH / 2).attr('dy', '0.35em').attr('text-anchor', 'end').text((d) => d.n).each(function () { hv.fit(this, lw - 12); });
+  [['u', 0, 4], ['rv', 3, 23]].forEach(([k, ci, y]) => {
+    g.append('rect').attr('class', 'bar').attr('x', lw).attr('y', y).attr('height', 17).attr('rx', 4).attr('width', (d) => Math.max(2, x(d[k]))).style('fill', hv.C(ci, el)).style('transition-delay', (d, i) => i * 60 + 'ms');
+    g.append('text').attr('class', 'hv-val').attr('x', (d) => lw + Math.max(2, x(d[k])) + 6).attr('y', y + 8.5).attr('dy', '0.35em').text((d) => hv.fmt(d[k], 'd1') + '%');
+  });
+  g.append('rect').attr('width', W).attr('height', rowH).style('fill', 'transparent')
+    .on('pointermove pointerdown', (ev, d) => t.show(ev, [d.n, `${hv.fmt(d.users, 'int')} người dùng (${hv.fmt(d.u, 'd1')}%)`, `${hv.fmt(d.rev, 'd1')} triệu ₫ doanh thu GA4 (${hv.fmt(d.rv, 'd1')}%)`]))
+    .on('pointerleave', () => t.hide());
+});
+
+dash.draw('ch-browser', (el) => {
+  const r = hv.rows('thiet_bi');
+  if (!r) return hv.empty(el, ['thiet_bi']);
+  const rs = r.filter((x) => x.dim === 'clarity');
+  const tot = d3.sum(rs, (x) => hv.num(x.users) || 0) || 1;
+  const items = rs.map((x) => {
+    const v = hv.num(x.users) || 0;
+    return { label: x.name, value: v, color: x.name === 'Ứng dụng Facebook' ? hv.C(0, el) : 'var(--barmute)', valueText: hv.fmt(v / tot * 100, 'd1') + '%', tip: [x.name, hv.fmt(v, 'int') + ' phiên', hv.fmt(v / tot * 100, 'd1') + '% phiên'] };
+  });
+  hv.hbar(el, items, { aria: 'Phiên theo trình duyệt trong 90 ngày gần nhất', rowH: 34 });
+});
+
+dash.draw('ch-bubbles', (el) => {
+  const r = hv.rows('thiet_bi');
+  if (!r) return hv.empty(el, ['thiet_bi', 'facts']);
+  const cs = r.filter((x) => x.dim === 'thanh_pho').map((x) => ({ n: x.name, v: hv.num(x.users) || 0, rv: hv.num(x.revenue_m) || 0, unk: x.name === 'Không xác định' }));
+  el.replaceChildren();
+  const W = Math.max(280, Math.floor(el.clientWidth || 600));
+  const H = Math.round(Math.min(480, Math.max(300, W * 0.6)));
+  const s = hv.svg(el, W, H, 'Người dùng theo thành phố, màu theo doanh thu');
+  const root = d3.hierarchy({ children: cs }).sum((d) => d.v || 0);
+  d3.pack().size([W, H]).padding(5)(root);
+  const maxRv = d3.max(cs.filter((c) => !c.unk), (c) => c.rv) || 1;
+  const color = d3.scaleSqrt().domain([0, maxRv]).range(['#b9e5dd', '#0b6b63']);
+  const t = hv.tip(el);
+  const g = s.selectAll('g.b').data(root.leaves()).join('g').attr('class', 'b').attr('transform', (d) => `translate(${d.x},${d.y})`);
+  g.append('circle').attr('class', 'dot').attr('r', (d) => d.r).style('fill', (d) => d.data.unk ? 'var(--barmute)' : color(d.data.rv)).style('stroke', 'var(--card)').style('stroke-width', 2)
+    .style('transition-delay', (d, i) => i * 60 + 'ms')
+    .on('pointermove pointerdown', (ev, d) => t.show(ev, [d.data.n, hv.fmt(d.data.v, 'int') + ' người dùng', hv.fmt(d.data.rv, 'd1') + ' triệu ₫ doanh thu GA4']))
+    .on('pointerleave', () => t.hide());
+  g.filter((d) => d.r > 30).append('text').attr('text-anchor', 'middle').attr('pointer-events', 'none').attr('dy', '-0.1em').style('font-weight', 700)
+    .style('font-size', (d) => Math.min(20, d.r / 3.2) + 'px').style('fill', (d) => d.data.unk ? 'var(--ink)' : hv.onFill(color(d.data.rv))).text((d) => d.data.n).each(function (d) { hv.fit(this, d.r * 1.8); });
+  g.filter((d) => d.r > 30).append('text').attr('text-anchor', 'middle').attr('pointer-events', 'none').attr('dy', '1.2em')
+    .style('font-size', (d) => Math.min(16, d.r / 3.8) + 'px').style('fill', (d) => d.data.unk ? 'var(--ink)' : hv.onFill(color(d.data.rv))).text((d) => hv.fmt(d.data.v, 'int'));
+});
+
+dash.draw('city-list', (el) => {
+  const r = hv.rows('thiet_bi');
+  el.replaceChildren();
+  if (!r) return;
+  r.filter((x) => x.dim === 'thanh_pho' && (hv.num(x.users) || 0) < 5000).forEach((x) => {
+    const c = document.createElement('span');
+    c.className = 'hv-chip2';
+    const b = document.createElement('b');
+    b.textContent = hv.fmt(x.users, 'int');
+    c.append(x.name + ' ', b);
+    el.appendChild(c);
+  });
+});
+
+dash.draw('rank-rows', (tb) => {
+  const r = hv.rows('thi_sinh');
+  tb.replaceChildren();
+  if (!r) return;
+  const fin = r.filter((x) => x.finalist === '1' || x.finalist === 1).map((x) => ({ ...x, v: hv.num(x.votes) || 0 })).sort((a, b) => b.v - a.v);
+  const tot = d3.sum(fin, (x) => x.v) || 1, max = d3.max(fin, (x) => x.v) || 1;
+  fin.forEach((x, i) => {
+    const tr = document.createElement('tr');
+    tr.setAttribute('data-key', encodeURIComponent(x.name));
+    const win = x.winner === '1' || x.winner === 1;
+    if (win) tr.className = 'win';
+    const td = (txt, cls) => { const c = document.createElement('td'); if (cls) c.className = cls; c.textContent = txt; tr.appendChild(c); return c; };
+    td(String(i + 1), 'r');
+    td(x.name);
+    td(x.sbd);
+    const vc = document.createElement('td'); vc.className = 'hv-barcell';
+    const wrap = document.createElement('div'); wrap.className = 'hv-barwrap';
+    const bar = document.createElement('span'); bar.className = 'hv-bar2';
+    bar.style.width = Math.max(1, x.v / max * 70) + '%';
+    bar.style.background = win ? '#ffc857' : '#ff7aa8';
+    const n = document.createElement('span'); n.textContent = hv.fmt(x.v, 'int');
+    wrap.append(bar, n); vc.appendChild(wrap); tr.appendChild(vc);
+    td(hv.fmt(x.v / tot * 100, 'd1') + '%', 'r');
+    td(hv.fmt(x.interest, 'int'), 'r');
+    td(hv.fmt(x.views, 'int'), 'r');
+    const tc = document.createElement('td');
+    if (win) { const s = document.createElement('span'); s.className = 'hv-tag'; s.textContent = 'Hoa hậu'; tc.appendChild(s); }
+    tr.appendChild(tc);
+    tb.appendChild(tr);
+  });
+});
+
+dash.draw('ch-topvotes', (el) => {
+  const r = hv.rows('thi_sinh');
+  if (!r) return hv.empty(el, ['thi_sinh']);
+  const tot = d3.sum(r.filter((x) => x.finalist === '1' || x.finalist === 1), (x) => hv.num(x.votes) || 0) || 1;
+  const items = r.filter((x) => (x.finalist === '1' || x.finalist === 1) && hv.num(x.votes) !== null)
+    .map((x) => ({ n: x.name, v: hv.num(x.votes), w: x.winner === '1' || x.winner === 1 })).sort((a, b) => b.v - a.v).slice(0, 10)
+    .map((x, i) => ({ label: `${i + 1}. ${x.n}`, value: x.v, color: x.w ? hv.C(1, el) : hv.C(0, el), valueText: `${hv.fmt(x.v, 'int')} · ${hv.fmt(x.v / tot * 100, 'd1')}%`, tip: [x.n, hv.fmt(x.v, 'int') + ' phiếu', hv.fmt(x.v / tot * 100, 'd1') + '% phiếu của 25 thí sinh'] }));
+  hv.hbar(el, items, { aria: 'Top 10 thí sinh theo phiếu bình chọn', rowH: 36 });
+});
+
+dash.draw('ch-scatter', (el) => {
+  const r = hv.rows('thi_sinh');
+  if (!r) return hv.empty(el, ['thi_sinh']);
+  const d = r.filter((x) => x.finalist === '1' || x.finalist === 1).map((x) => ({ n: x.name, v: hv.num(x.votes) || 1, w: hv.num(x.views) || 1, win: x.winner === '1' || x.winner === 1 }));
+  el.replaceChildren();
+  const W = Math.max(280, Math.floor(el.clientWidth || 600));
+  const H = Math.round(Math.min(400, Math.max(300, W * 0.7)));
+  const m = { l: 62, r: 14, t: 12, b: 30 };
+  const s = hv.svg(el, W, H, 'Phiếu bình chọn so với lượt xem hồ sơ của 25 thí sinh chung kết');
+  const x = d3.scaleLog().domain([400, 10000]).range([m.l, W - m.r]);
+  const y = d3.scaleLog().domain([100, 300000]).range([H - m.b, m.t]);
+  [100, 1000, 10000, 100000].forEach((v) => {
+    s.append('line').attr('class', 'hv-grid-l').attr('x1', m.l).attr('x2', W - m.r).attr('y1', y(v)).attr('y2', y(v));
+    s.append('text').attr('class', 'hv-tick').attr('x', m.l - 8).attr('y', y(v)).attr('dy', '0.35em').attr('text-anchor', 'end').text(hv.fmt(v, 'int'));
+  });
+  (W < 420 ? [500, 2000, 8000] : [500, 1000, 2000, 5000, 10000]).forEach((v) => s.append('text').attr('class', 'hv-tick').attr('x', x(v)).attr('y', H - 8).attr('text-anchor', 'middle').text(hv.fmt(v, 'int')));
+  s.append('line').attr('class', 'hv-axis-l').attr('x1', m.l).attr('x2', W - m.r).attr('y1', H - m.b).attr('y2', H - m.b);
+  const t = hv.tip(el);
+  const show = { 'Vũ Hồng Hạnh': 'r', 'Phạm Lê Ái Linh': 'l', 'Đinh Hoàng Gia Linh': 'r', 'Nguyễn Yến Trang': 'l', 'Trần Xuân Khánh Linh': 'r', 'Nguyễn Thị Thuý Linh': 'r' };
+  d.sort((a, b) => a.win - b.win);
+  s.selectAll('circle.dot').data(d).join('circle').attr('class', 'dot').attr('cx', (p) => x(p.w)).attr('cy', (p) => y(p.v)).attr('r', (p) => p.win ? 9 : 6.5)
+    .style('fill', (p) => p.win ? hv.C(1, el) : hv.C(0, el)).style('stroke', 'var(--card)').style('stroke-width', 2).style('transition-delay', (p, i) => i * 30 + 'ms');
+  d.filter((p) => show[p.n]).forEach((p) => {
+    const left = show[p.n] === 'l';
+    s.append('text').attr('class', 'hv-lab').attr('x', x(p.w) + (left ? -12 : 12)).attr('y', y(p.v)).attr('dy', '0.35em').attr('text-anchor', left ? 'end' : 'start').style('font-weight', p.win ? 700 : 400).text(p.n);
+  });
+  s.selectAll('circle.h').data(d).join('circle').attr('class', 'h').attr('cx', (p) => x(p.w)).attr('cy', (p) => y(p.v)).attr('r', 14).style('fill', 'transparent')
+    .on('pointermove pointerdown', (ev, p) => t.show(ev, [p.n, hv.fmt(p.v, 'int') + ' phiếu', hv.fmt(p.w, 'int') + ' lượt xem hồ sơ', hv.fmt(p.v / p.w, 'int') + ' phiếu mỗi lượt xem']))
+    .on('pointerleave', () => t.hide());
+});
+
+dash.draw('cat-lead', (el) => {
+  const r = hv.rows('hang_muc');
+  el.replaceChildren();
+  if (!r) return;
+  const cats = Array.from(new Set(r.map((x) => x.category)));
+  cats.forEach((c, i) => {
+    const rs = r.filter((x) => x.category === c).sort((a, b) => (hv.num(a.rank) || 0) - (hv.num(b.rank) || 0));
+    if (rs.length < 2) return;
+    const a = rs[0], b = rs[1];
+    const ratio = (hv.num(a.votes) || 0) / (hv.num(b.votes) || 1);
+    const card = document.createElement('div'); card.className = 'hv-lead'; card.style.borderTopColor = hv.C(i, el);
+    const mk = (cls, txt) => { const e = document.createElement('span'); e.className = cls; e.textContent = txt; card.appendChild(e); };
+    mk('c', c); mk('n', a.name); mk('v', hv.fmt(a.votes, 'int') + ' phiếu');
+    mk('g', `gấp ${hv.fmt(ratio, 'd1')} lần hạng 2 (${b.name})`);
+    el.appendChild(card);
+  });
+});
+
+dash.draw('cat', (el) => {
+  const r = hv.rows('hang_muc');
+  if (!r) return hv.empty(el, ['hang_muc']);
+  const cat = el.getAttribute('data-cat');
+  const rs = r.filter((x) => x.category === cat).sort((a, b) => (hv.num(a.rank) || 0) - (hv.num(b.rank) || 0));
+  const tot = rs.length ? hv.num(rs[0].category_total) : null;
+  const items = rs.map((x) => ({
+    label: x.name, value: hv.num(x.votes) || 0,
+    color: x.name === 'Nguyễn Yến Trang' ? hv.C(1, el) : hv.C(0, el),
+    valueText: hv.fmt(x.votes, 'int'),
+    tip: [x.name, `Hạng ${x.rank} · ${hv.fmt(x.votes, 'int')} phiếu`, tot ? `${hv.fmt((hv.num(x.votes) || 0) / tot * 100, 'd1')}% phiếu của 12 người đầu` : '']
+  }));
+  hv.hbar(el, items, { aria: 'Top 5 thí sinh hạng mục ' + cat, rowH: 28 });
+});
+
+dash.draw('podium', (el) => {
+  const r = hv.rows('thi_sinh');
+  el.replaceChildren();
+  if (!r) return;
+  const top = r.filter((x) => (x.finalist === '1' || x.finalist === 1) && hv.num(x.interest) !== null).sort((a, b) => hv.num(b.interest) - hv.num(a.interest)).slice(0, 3);
+  if (top.length < 3) return;
+  const order = [1, 0, 2];
+  const hs = [100, 78, 58];
+  order.forEach((idx) => {
+    const x = top[idx];
+    const b = document.createElement('div'); b.className = 'hv-pod';
+    b.style.height = (hs[idx] / 100 * 250) + 'px';
+    b.style.background = hv.C(idx === 0 ? 0 : (idx === 1 ? 1 : 4), el);
+    b.style.color = hv.onFill(hv.C(idx === 0 ? 0 : (idx === 1 ? 1 : 4), el));
+    const mk = (cls, txt) => { const e = document.createElement('span'); e.className = cls; e.textContent = txt; b.appendChild(e); };
+    mk('r', String(idx + 1)); mk('n', x.name); mk('v', hv.fmt(x.interest, 'int')); mk('u', 'lượt quan tâm');
+    el.appendChild(b);
+  });
+});
+
+dash.draw('ch-interest', (el) => {
+  const r = hv.rows('thi_sinh');
+  if (!r) return hv.empty(el, ['thi_sinh']);
+  const items = r.filter((x) => (x.finalist === '1' || x.finalist === 1) && hv.num(x.interest) !== null)
+    .map((x) => ({ n: x.name, v: hv.num(x.interest), w: x.winner === '1' || x.winner === 1 })).sort((a, b) => b.v - a.v).slice(0, 10)
+    .map((x) => ({ label: x.n, value: x.v, color: x.w ? hv.C(1, el) : hv.C(0, el), valueText: hv.fmt(x.v, 'int'), tip: [x.n, hv.fmt(x.v, 'int') + ' lượt quan tâm'] }));
+  hv.hbar(el, items, { aria: 'Top 10 thí sinh theo lượt quan tâm', rowH: 32 });
+});
+
+dash.draw('ch-views', (el) => {
+  const r = hv.rows('thi_sinh');
+  if (!r) return hv.empty(el, ['thi_sinh']);
+  const items = r.map((x) => ({ n: x.name, v: hv.num(x.views) || 0, fin: x.finalist === '1' || x.finalist === 1 })).sort((a, b) => b.v - a.v).slice(0, 10)
+    .map((x) => ({ label: x.n, value: x.v, color: x.fin ? hv.C(0, el) : 'var(--barmute)', valueText: hv.fmt(x.v, 'int'), tip: [x.n, hv.fmt(x.v, 'int') + ' lượt xem hồ sơ', x.fin ? 'Vào chung kết' : 'Không nằm trong 25 thí sinh chung kết'] }));
+  hv.hbar(el, items, { aria: 'Top 10 thí sinh theo lượt xem hồ sơ', rowH: 32 });
+});
+
+dash.draw('ch-bridge', (el) => {
+  const r = hv.rows('doanh_thu');
+  if (!r) return hv.empty(el, ['doanh_thu']);
+  const val = (x) => hv.num(x.revenue_m) || 0;
+  const total = d3.sum(r, val);
+  const hhvn = d3.sum(r.filter((x) => x.kind === 'hhvn'), val);
+  const steps = [{ n: 'GA4 ghi nhận (theo mặt hàng)', a: 0, b: total, c: hv.C(0, el), v: total }];
+  let run = total;
+  r.filter((x) => x.kind !== 'hhvn').forEach((x) => { const v = val(x); steps.push({ n: 'Loại: ' + x.item, a: run - v, b: run, c: 'var(--bad)', v: -v }); run -= v; });
+  steps.push({ n: 'Doanh thu HHVN', a: 0, b: hhvn, c: hv.C(2, el), v: hhvn });
+  el.replaceChildren();
+  const W = Math.max(280, Math.floor(el.clientWidth || 600));
+  const rowH = 38;
+  const s = hv.svg(el, W, steps.length * rowH + 4, 'Từ doanh thu GA4 tới doanh thu thật của HHVN');
+  const lw = Math.min(W * 0.42, hv.textW(s, steps.map((d) => d.n), 'hv-lab') + 12);
+  const vw = hv.textW(s, ['−1.246,9'], 'hv-val') + 12;
+  const x = d3.scaleLinear().domain([0, total]).range([lw, Math.max(lw + 60, W - vw)]);
+  const t = hv.tip(el);
+  const g = s.selectAll('g.r').data(steps).join('g').attr('transform', (d, i) => `translate(0,${i * rowH})`);
+  g.append('text').attr('class', 'hv-lab').attr('x', lw - 10).attr('y', rowH / 2).attr('dy', '0.35em').attr('text-anchor', 'end').text((d) => d.n).each(function () { hv.fit(this, lw - 12); });
+  g.append('rect').attr('class', 'bar').attr('x', (d) => x(d.a)).attr('y', 6).attr('height', rowH - 12).attr('rx', 4).attr('width', (d) => Math.max(2, x(d.b) - x(d.a))).style('fill', (d) => d.c).style('transition-delay', (d, i) => i * 140 + 'ms');
+  g.append('text').attr('class', 'hv-val').attr('x', (d) => x(d.b) + 6).attr('y', rowH / 2).attr('dy', '0.35em').text((d) => (d.v < 0 ? '−' : '') + hv.fmt(Math.abs(d.v), 'd1'));
+  g.append('rect').attr('width', W).attr('height', rowH).style('fill', 'transparent')
+    .on('pointermove pointerdown', (ev, d) => t.show(ev, [d.n, (d.v < 0 ? '−' : '') + hv.fmt(Math.abs(d.v), 'd1') + ' triệu ₫', hv.fmt(Math.abs(d.v) / total * 100, 'd1') + '% doanh thu GA4']))
+    .on('pointerleave', () => t.hide());
+});
+
+dash.draw('ch-mix', (el) => {
+  const r = hv.rows('doanh_thu');
+  if (!r) return hv.empty(el, ['doanh_thu']);
+  const gc = { 'Gói bình chọn': 0, 'Vé đêm chung kết': 1, 'Vé chung khảo': 2 };
+  const items = r.filter((x) => x.kind === 'hhvn').map((x) => ({ n: x.item, g: x.group, v: hv.num(x.revenue_m) || 0, q: hv.num(x.qty) })).sort((a, b) => b.v - a.v)
+    .map((x) => ({ label: x.n, value: x.v, color: hv.C(gc[x.g] || 0, el), valueText: hv.fmt(x.v, 'd1'), tip: [x.n, hv.fmt(x.v, 'd1') + ' triệu ₫', x.q !== null ? hv.fmt(x.q, 'int') + (x.g === 'Gói bình chọn' ? ' gói' : ' vé') : ''].filter(Boolean) }));
+  hv.hbar(el, items, { aria: 'Doanh thu HHVN theo mặt hàng', rowH: 28 });
+});
+
+dash.draw('ch-revch', (el) => {
+  const r = hv.rows('truy_cap');
+  if (!r) return hv.empty(el, ['truy_cap']);
+  const order = ['Mạng xã hội', 'Trực tiếp', 'Tìm kiếm', 'Giới thiệu', 'Quảng cáo', 'Không xác định'];
+  const segs = r.filter((x) => x.level === 'kenh').map((x) => ({ label: x.name, value: hv.num(x.revenue_m) || 0, color: hv.C(Math.max(0, order.indexOf(x.group)), el), extra: hv.fmt(x.revenue_m, 'd1') + ' triệu ₫' })).sort((a, b) => b.value - a.value);
+  hv.stack100(el, segs, { aria: 'Tỷ trọng doanh thu theo kênh khách đến', minLabel: 0.005 });
+});
+
+dash.draw('funnel', (el) => {
+  const r = hv.rows('hanh_vi');
+  if (!r) return hv.empty(el, ['hanh_vi']);
+  const fn = el.getAttribute('data-funnel');
+  const rs = r.filter((x) => x.funnel === fn).sort((a, b) => (hv.num(a.order) || 0) - (hv.num(b.order) || 0));
+  const first = rs.length ? hv.num(rs[0].users) || 1 : 1;
+  el.replaceChildren();
+  const W = Math.max(240, Math.floor(el.clientWidth || 360));
+  const rowH = 74, bh = 38;
+  const s = hv.svg(el, W, rs.length * rowH, 'Phễu ' + fn);
+  const x = d3.scaleLinear().domain([0, first]).range([0, W]);
+  const t = hv.tip(el);
+  rs.forEach((d, i) => {
+    const w = Math.max(26, x(hv.num(d.users) || 0));
+    const y = i * rowH + 22;
+    const col = hv.C(i, el);
+    s.append('text').attr('class', 'hv-lab').attr('x', W / 2).attr('y', i * rowH + 12).attr('text-anchor', 'middle').text(d.step).each(function () { hv.fit(this, W); });
+    if (i < rs.length - 1) {
+      const w2 = Math.max(26, x(hv.num(rs[i + 1].users) || 0));
+      s.append('path').attr('d', `M${(W - w) / 2},${y + bh} L${(W + w) / 2},${y + bh} L${(W + w2) / 2},${y + rowH} L${(W - w2) / 2},${y + rowH} Z`).style('fill', col).style('opacity', 0.28);
+    }
+    const pct = (hv.num(d.users) || 0) / first * 100;
+    s.append('rect').attr('class', 'bar').attr('x', (W - w) / 2).attr('y', y).attr('width', w).attr('height', bh).attr('rx', 6).style('fill', col).style('transform-origin', 'center').style('transition-delay', i * 120 + 'ms')
+      .on('pointermove pointerdown', (ev) => t.show(ev, [d.step, hv.fmt(d.users, 'int') + ' người', hv.fmt(pct, 'd1') + '% so với bước đầu']))
+      .on('pointerleave', () => t.hide());
+    const lbl = `${hv.fmt(d.users, 'int')} · ${hv.fmt(pct, 'int')}%`;
+    const tw = hv.textW(s, [lbl], 'hv-val') + 16;
+    const inside = w >= tw;
+    s.append('text').attr('class', 'hv-val').attr('x', inside ? W / 2 : Math.min(W - 4, (W + w) / 2 + 8)).attr('y', y + bh / 2).attr('dy', '0.35em').attr('text-anchor', inside ? 'middle' : (((W + w) / 2 + 8 + tw > W) ? 'end' : 'start')).attr('pointer-events', 'none').style('fill', inside ? hv.onFill(col) : 'var(--ink)').text(lbl);
+  });
+});
+
+dash.draw('ch-gauge', (el) => {
+  const f = hv.rows('facts');
+  if (!f) return hv.empty(el, ['facts']);
+  const v = hv.fact(f, 'perf') || 0;
+  el.replaceChildren();
+  const W = Math.max(240, Math.floor(el.clientWidth || 360));
+  const R = Math.min(W / 2 - 8, 150), w = 26;
+  const H = R + 56;
+  const s = hv.svg(el, W, H, 'Điểm hiệu năng ' + v + ' trên 100');
+  const g = s.append('g').attr('transform', `translate(${W / 2},${R + 12})`);
+  const A = (a0, a1) => d3.arc().innerRadius(R - w).outerRadius(R).startAngle(a0).endAngle(a1).cornerRadius(6)();
+  const ang = (p) => -Math.PI / 2 + Math.PI * p / 100;
+  [[0, 50, '#ff6b57'], [50, 90, '#ffb020'], [90, 100, '#2fbf71']].forEach(([a, b, c]) => g.append('path').attr('d', A(ang(a) + 0.02, ang(b) - 0.02)).style('fill', c).style('opacity', 0.28));
+  const col = v >= 90 ? '#2fbf71' : (v >= 50 ? '#ffb020' : '#ff6b57');
+  g.append('path').attr('class', 'arc').attr('d', A(ang(0), ang(v))).style('fill', col);
+  g.append('text').attr('text-anchor', 'middle').attr('y', -6).style('font-size', '48px').style('font-weight', 700).text(hv.fmt(v, 'int'));
+  g.append('text').attr('text-anchor', 'middle').attr('y', 22).attr('class', 'hv-lab').style('fill', 'var(--mute)').text('trên 100 điểm');
+});
+
+dash.draw('ch-jserr', (el) => {
+  const f = hv.rows('facts');
+  if (!f) return hv.empty(el, ['facts']);
+  const z = hv.fact(f, 'zalo_err') || 0;
+  hv.stack100(el, [
+    { label: 'Bộ nhúng Zalo không tải được', value: z, color: 'var(--bad)' },
+    { label: 'Lỗi khác', value: Math.max(0, 100 - z), color: 'var(--barmute)' }
+  ], { aria: 'Tỷ trọng lỗi kỹ thuật theo nguyên nhân' });
+});
+</script>
+
+</div>
+</body>
+</html>
