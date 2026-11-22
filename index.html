@@ -47,7 +47,21 @@
 .hv-s7 { --ink: #3d2c00; --mute: #7f6420; --card: #fffdf6; --line: #f0d98f; --accent: #c98a00; --barmute: #e8d9a9; --bad: #d9480f; --bg: linear-gradient(180deg, #ffefb8, #fff8dc); }
 .hv-s8 { --ink: #10264d; --mute: #4c6490; --card: #ffffff; --line: #c4d6f5; --accent: #2a5fd0; --barmute: #c0cde8; --bad: #d9480f; --bg: linear-gradient(180deg, #dde9ff, #eef4ff); }
 .hv-s9 { --ink: #eef1ff; --mute: rgba(238,241,255,.74); --card: rgba(255,255,255,.08); --line: rgba(255,255,255,.2); --accent: #7fe3d4; --barmute: rgba(255,255,255,.28); --bad: #ff8a73; --bg: linear-gradient(160deg, #141a3a 0%, #232c63 100%); }
+.hv-s10 { --ink: #fff3f7; --mute: rgba(255,243,247,.86); --card: rgba(255,255,255,.1); --line: rgba(255,255,255,.24); --accent: #ffc857; --barmute: rgba(255,255,255,.28); --bad: #ffd0c4; --bg: linear-gradient(135deg, #6d1240 0%, #c2185b 100%); }
 .hv-foot { --ink: #fff3f7; --mute: rgba(255,243,247,.74); --bg: #2d0820; }
+
+/* ---- chapter 10: from HHVN to Hue ---- */
+.hv-s10 .hv-cl b { color: var(--accent); }
+.hv-s10 .hv-card { backdrop-filter: blur(6px); box-shadow: none; }
+.hv-no { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--accent); color: #2d0820; font-weight: 700; font-size: 17px; }
+.hv-idea h3 { margin: 0; font-size: 21px; line-height: 1.2; }
+.hv-idea p { margin: 0; color: var(--mute); font-size: 16px; }
+.hv-idea p b { color: var(--accent); }
+.hv-meas { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 16px; }
+.hv-meas > div { border-top: 2px solid var(--accent); padding-top: 10px; display: grid; gap: 2px; }
+.hv-meas b { font-size: 18px; }
+.hv-meas span { color: var(--mute); font-size: 15px; }
+.hv-code { margin: 0; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 14px; background: rgba(0,0,0,.28); border-radius: 8px; padding: 10px 12px; overflow-wrap: anywhere; line-height: 1.5; }
 
 /* ---- chapter heading ---- */
 .hv-chh { display: grid; gap: 10px; max-width: 70ch; }
@@ -243,6 +257,9 @@
   .hv-chart .bar, .hv-chart .dot { transform: none !important; }
   .hv-tip { display: none; }
 }
+/* ---- headings in bold ---- */
+.hv h1, .hv h2, .hv h3, .hv h4, .hv summary, .hv .hv-ck, .hv .hv-st { font-weight: 700; }
+.hv .hv-ct, .hv .hv-h1 { -webkit-text-stroke: .025em currentColor; }
 </style>
 
 <div class="hv" id="hv-top">
@@ -259,6 +276,7 @@
     <a class="hv-chip" href="#c7" data-ch="c7"><b>7</b>Doanh thu</a>
     <a class="hv-chip" href="#c8" data-ch="c8"><b>8</b>Hành trình mua</a>
     <a class="hv-chip" href="#c9" data-ch="c9"><b>9</b>Trải nghiệm</a>
+    <a class="hv-chip" href="#c10" data-ch="c10"><b>10</b>Sang Huế</a>
   </nav>
   <i class="hv-prog" id="hv-prog"></i>
 </div>
@@ -286,7 +304,7 @@
   <div class="hv-in">
     <header class="hv-chh hv-rv">
       <span class="hv-wm" aria-hidden="true">1</span>
-      <p class="hv-ck">Chương 1 trên 9</p>
+      <p class="hv-ck">Chương 1 trên 10</p>
       <h2 class="hv-ct">1. Hành trình năm tháng</h2>
       <p class="hv-cl">Mùa thi đi từ họp báo ngày 05/05 tới đêm chung kết ngày 07/11. Mỗi chặng mới kéo theo một nguồn khán giả khác: lúc mở bình chọn, mạng xã hội mang về khoảng <b>hai phần ba</b> lượt truy cập.</p>
     </header>
@@ -323,7 +341,7 @@
   <div class="hv-in">
     <header class="hv-chh hv-rv">
       <span class="hv-wm" aria-hidden="true">2</span>
-      <p class="hv-ck">Chương 2 trên 9</p>
+      <p class="hv-ck">Chương 2 trên 10</p>
       <h2 class="hv-ct">2. Khán giả đến từ đâu</h2>
       <p class="hv-cl">Cuộn xuống để xem từng lớp của câu chuyện: ai đưa khán giả tới, ai giữ họ lại, và kênh nào còn bỏ ngỏ.</p>
     </header>
@@ -363,7 +381,7 @@
   <div class="hv-in">
     <header class="hv-chh hv-rv">
       <span class="hv-wm" aria-hidden="true">3</span>
-      <p class="hv-ck">Chương 3 trên 9</p>
+      <p class="hv-ck">Chương 3 trên 10</p>
       <h2 class="hv-ct">3. Họ xem bằng thiết bị gì</h2>
       <p class="hv-cl"><b data-draw="fact" data-source="facts" data-field="value" data-where="key=share_mobile" data-fmt="d1">—</b>% người xem dùng điện thoại, và <b data-draw="fact" data-source="facts" data-field="value" data-where="key=share_fbapp" data-fmt="d1">—</b>% lượt truy cập mở ngay trong ứng dụng Facebook. Điều lạ là phần lớn doanh thu lại được ghi trên máy tính, đặc biệt là máy Mac.</p>
     </header>
@@ -399,7 +417,7 @@
   <div class="hv-in">
     <header class="hv-chh hv-rv">
       <span class="hv-wm" aria-hidden="true">4</span>
-      <p class="hv-ck">Chương 4 trên 9</p>
+      <p class="hv-ck">Chương 4 trên 10</p>
       <h2 class="hv-ct">4. Họ ở đâu</h2>
       <p class="hv-cl">Hà Nội chiếm <b data-draw="fact" data-source="facts" data-field="value" data-where="key=hanoi_share" data-fmt="d1">—</b>% người dùng. Hải Phòng, nơi tổ chức đêm chung kết, đứng thứ ba về người dùng nhưng thứ hai về doanh thu.</p>
     </header>
@@ -419,7 +437,7 @@
   <div class="hv-in">
     <header class="hv-chh hv-rv">
       <span class="hv-wm" aria-hidden="true">5</span>
-      <p class="hv-ck">Chương 5 trên 9</p>
+      <p class="hv-ck">Chương 5 trên 10</p>
       <h2 class="hv-ct">5. Cuộc đua bình chọn</h2>
       <p class="hv-cl">Vũ Hồng Hạnh dẫn đầu với <b data-draw="fact" data-source="facts" data-field="value" data-where="key=top_votes" data-fmt="int">—</b> phiếu, bằng <b data-draw="fact" data-source="facts" data-field="value" data-where="key=top_share" data-fmt="d1">—</b>% tổng phiếu. Nhưng vương miện thuộc về người đứng thứ <b data-draw="fact" data-source="facts" data-field="value" data-where="key=winner_rank" data-fmt="int">—</b>.</p>
     </header>
@@ -476,7 +494,7 @@
   <div class="hv-in">
     <header class="hv-chh hv-rv">
       <span class="hv-wm" aria-hidden="true">6</span>
-      <p class="hv-ck">Chương 6 trên 9</p>
+      <p class="hv-ck">Chương 6 trên 10</p>
       <h2 class="hv-ct">6. Ai được yêu thích</h2>
       <p class="hv-cl">Lượt quan tâm và lượt xem hồ sơ vẽ ra một bảng xếp hạng khác hẳn bảng phiếu. Đinh Hoàng Gia Linh dẫn đầu lượt quan tâm (<b data-draw="fact" data-source="facts" data-field="value" data-where="key=top_interest" data-fmt="int">—</b>), còn Phạm Lê Ái Linh được xem hồ sơ nhiều nhất (<b data-draw="fact" data-source="facts" data-field="value" data-where="key=top_profile_views" data-fmt="int">—</b> lượt).</p>
     </header>
@@ -503,7 +521,7 @@
   <div class="hv-in">
     <header class="hv-chh hv-rv">
       <span class="hv-wm" aria-hidden="true">7</span>
-      <p class="hv-ck">Chương 7 trên 9</p>
+      <p class="hv-ck">Chương 7 trên 10</p>
       <h2 class="hv-ct">7. Doanh thu đến từ đâu</h2>
       <p class="hv-cl">GA4 ghi <b data-draw="fact" data-source="facts" data-field="value" data-where="key=rev_item" data-fmt="d1">—</b> triệu đồng, nhưng gần một nửa là giao dịch thử và một sự kiện khác. Doanh thu của HHVN là <b data-draw="fact" data-source="facts" data-field="value" data-where="key=rev_hhvn" data-fmt="d1">—</b> triệu đồng, chia gần đều giữa gói bình chọn và vé đêm chung kết.</p>
     </header>
@@ -539,7 +557,7 @@
   <div class="hv-in">
     <header class="hv-chh hv-rv">
       <span class="hv-wm" aria-hidden="true">8</span>
-      <p class="hv-ck">Chương 8 trên 9</p>
+      <p class="hv-ck">Chương 8 trên 10</p>
       <h2 class="hv-ct">8. Khán giả đi được bao xa</h2>
       <p class="hv-cl">Chỉ <b data-draw="fact" data-source="facts" data-field="value" data-where="key=cta_rate" data-fmt="d1">—</b>% người bấm nút trên trang thí sinh có kết quả được ghi nhận, và <b data-draw="fact" data-source="facts" data-field="value" data-where="key=reg_rate" data-fmt="d1">—</b>% người bắt đầu đăng ký đi tới cuối. Ngược lại, đã vào bước thanh toán thì <b data-draw="fact" data-source="facts" data-field="value" data-where="key=buy_rate" data-fmt="d1">—</b>% mua thành công.</p>
     </header>
@@ -556,7 +574,7 @@
   <div class="hv-in">
     <header class="hv-chh hv-rv">
       <span class="hv-wm" aria-hidden="true">9</span>
-      <p class="hv-ck">Chương 9 trên 9</p>
+      <p class="hv-ck">Chương 9 trên 10</p>
       <h2 class="hv-ct">9. Trải nghiệm trên website</h2>
       <p class="hv-cl">Website hiện nội dung đủ nhanh nhưng phản hồi chậm khi chạm, và <b data-draw="fact" data-source="facts" data-field="value" data-where="key=js_share" data-fmt="d1">—</b>% lượt truy cập gặp lỗi kỹ thuật, phần lớn do bộ nhúng Zalo. Số liệu Microsoft Clarity, 90 ngày gần nhất.</p>
     </header>
@@ -581,6 +599,40 @@
   </div>
 </section>
 
+<section class="hv-scene hv-s10" id="c10" data-pal="rose" data-ch="c10">
+  <div class="hv-in">
+    <header class="hv-chh hv-rv">
+      <span class="hv-wm" aria-hidden="true">10</span>
+      <p class="hv-ck">Chương 10 trên 10</p>
+      <h2 class="hv-ct">10. Từ HHVN sang Huế</h2>
+      <p class="hv-cl"><b data-draw="fact" data-source="facts" data-field="value" data-where="key=users" data-fmt="int">—</b> người đã ghé LaSoong trong mùa thi, <b data-draw="fact" data-source="facts" data-field="value" data-where="key=share_mobile" data-fmt="d1">—</b>% xem bằng điện thoại và <b data-draw="fact" data-source="facts" data-field="value" data-where="key=share_social" data-fmt="d1">—</b>% đến từ Facebook và Zalo. Đó là tệp khán giả sẵn có để đưa sang gian hàng Huế, không cần tìm nguồn traffic mới.</p>
+    </header>
+    <div class="hv-grid3">
+      <div class="hv-card hv-idea hv-rv"><span class="hv-no">1</span><h3>Hoa hậu kể về Huế</h3><p>Nguyễn Yến Trang đăng chuỗi bài về áo dài Huế và Đại Nội. Link nằm trong bài và phần mô tả hồ sơ.</p></div>
+      <div class="hv-card hv-idea hv-rv" style="--d:80ms"><span class="hv-no">2</span><h3>Thí sinh đi Huế</h3><p>Năm đến mười thí sinh có nhiều fan quay chuỗi "Một ngày ở Huế". Mỗi người một link riêng, fan của họ là tệp HHVN.</p></div>
+      <div class="hv-card hv-idea hv-rv" style="--d:160ms"><span class="hv-no">3</span><h3>Fanpage và Zalo</h3><p>Ghim một bài về Huế ở fanpage HHVN và LaSoong, gửi tin cho người đã theo dõi Zalo.</p></div>
+      <div class="hv-card hv-idea hv-rv" style="--d:240ms"><span class="hv-no">4</span><h3>Cộng đồng fan</h3><p>Nhờ các nhóm fan thí sinh đăng bài "Fan cùng đi Huế" ngay trong nhóm Zalo và Facebook của họ.</p></div>
+      <div class="hv-card hv-idea hv-rv" style="--d:320ms"><span class="hv-no">5</span><h3>Báo đã đăng HHVN</h3><p>Đề nghị một bài về Hoa hậu ở Huế. Độc giả báo Thanh Niên ở lại tương tác tới <b data-draw="fact" data-source="facts" data-field="value" data-where="key=press_engaged" data-fmt="d1">—</b>%, cao nhất trong các nguồn.</p></div>
+    </div>
+    <div class="hv-grid2">
+      <div class="hv-card hv-rv">
+        <h4>Link riêng cho từng kênh</h4>
+        <p class="hv-code">lasoong.com/destination-experience/co-do-hue<br>?utm_source=thisinh_tên<br>&amp;utm_medium=social<br>&amp;utm_campaign=hhvn_sang_hue</p>
+        <p class="hv-note">Mùa HHVN mới có <b data-draw="fact" data-source="facts" data-field="value" data-where="key=tracked_sessions" data-fmt="int">—</b> lượt truy cập từ <b data-draw="fact" data-source="facts" data-field="value" data-where="key=tracked_links" data-fmt="int">—</b> link riêng, vì ít người dùng link. Ghim link ở hồ sơ và mô tả bài, dùng link rút gọn.</p>
+      </div>
+      <div class="hv-card hv-rv" style="--d:100ms">
+        <h4>Kết quả đo sau khi xong</h4>
+        <div class="hv-meas">
+          <div><b>Người sang Huế</b><span>Số người từ HHVN vào gian hàng</span></div>
+          <div><b>Theo từng kênh</b><span>Hoa hậu, thí sinh, fanpage, nhóm fan, báo</span></div>
+          <div><b>Ở lại tương tác</b><span>Có xem tiếp hay thoát ngay</span></div>
+          <div><b>Vào trang vé</b><span>Số người xem trang vé Cố đô Huế</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <footer class="hv-scene hv-foot" id="nguon" data-pal="wine">
   <div class="hv-in">
     <details>
@@ -591,6 +643,7 @@
         <li>Phiếu bình chọn và lượt quan tâm: trang hồ sơ 25 thí sinh và 6 trang hạng mục trên lasoong.com, đọc ngày 18/11/2026. Trang hạng mục chỉ hiện 12 thí sinh đầu.</li>
         <li>Lượt xem hồ sơ: số lần xem trang thí sinh có tên thí sinh trong GA4.</li>
         <li>Hoa hậu Việt Nam 2026: <a href="https://vnexpress.net/25-nguoi-dep-tranh-vuong-mien-hoa-hau-viet-nam-2026-5141856.html" target="_blank" rel="noopener">VnExpress</a>.</li>
+        <li>Gian hàng Huế: lasoong.com/destination-experience/co-do-hue, kiểm tra ngày 22/11/2026.</li>
         <li>Doanh thu là số GA4, chưa đối soát với cổng thanh toán và còn lẫn giao dịch thử. Còn một nhóm truy cập Opera ở Hải Phòng bất thường, cùng bot và máy chủ nước ngoài; nguyên nhân các điểm này là suy luận từ số liệu, chưa được xác minh.</li>
       </ul>
     </details>
@@ -929,7 +982,12 @@ dash.draw('ch-ring', (el) => {
     g.append('path').attr('class', 'arc').attr('d', val()).style('fill', hv.C(i, el)).style('transition-delay', i * 150 + 'ms')
       .on('pointermove pointerdown', (ev) => t.show(ev, [d.n, hv.fmt(d.v, 'd1') + '%']))
       .on('pointerleave', () => t.hide());
-    g.append('text').attr('class', 'hv-lab').attr('x', -8).attr('y', -(ro - w / 2)).attr('dy', '0.35em').attr('text-anchor', 'end').style('font-size', '12px').text(`${d.n} ${hv.fmt(d.v, 'd1')}%`);
+    const rv = ` ${hv.fmt(d.v, 'd1')}%`;
+    g.append('text').attr('class', 'hv-lab').attr('x', -8).attr('y', -(ro - w / 2)).attr('dy', '0.35em').attr('text-anchor', 'end').style('font-size', '12px').text(d.n + rv)
+      .each(function () {
+        let nm = d.n;
+        while (nm.length > 3 && this.getComputedTextLength() > S / 2 - 12) { nm = nm.slice(0, -1); this.textContent = nm.trimEnd() + '…' + rv; }
+      });
   });
 });
 
@@ -1072,9 +1130,23 @@ dash.draw('ch-scatter', (el) => {
   d.sort((a, b) => a.win - b.win);
   s.selectAll('circle.dot').data(d).join('circle').attr('class', 'dot').attr('cx', (p) => x(p.w)).attr('cy', (p) => y(p.v)).attr('r', (p) => p.win ? 9 : 6.5)
     .style('fill', (p) => p.win ? hv.C(1, el) : hv.C(0, el)).style('stroke', 'var(--card)').style('stroke-width', 2).style('transition-delay', (p, i) => i * 30 + 'ms');
-  d.filter((p) => show[p.n]).forEach((p) => {
-    const left = show[p.n] === 'l';
-    s.append('text').attr('class', 'hv-lab').attr('x', x(p.w) + (left ? -12 : 12)).attr('y', y(p.v)).attr('dy', '0.35em').attr('text-anchor', left ? 'end' : 'start').style('font-weight', p.win ? 700 : 400).text(p.n);
+  const placed = [];
+  d.filter((p) => show[p.n]).sort((a, b) => (b.win - a.win) || (b.v - a.v)).forEach((p) => {
+    const probe = s.append('text').attr('class', 'hv-lab').style('font-weight', p.win ? 700 : 400).text(p.n);
+    const tw = probe.node().getComputedTextLength();
+    probe.remove();
+    const cx = x(p.w), cy = y(p.v);
+    const sides = show[p.n] === 'l' ? ['l', 'r'] : ['r', 'l'];
+    for (const side of sides) {
+      const x0 = side === 'l' ? cx - 12 - tw : cx + 12;
+      const box = { x0: x0 - 4, x1: x0 + tw + 4, y0: cy - 10, y1: cy + 10 };
+      const inside = box.x0 >= m.l && box.x1 <= W - 2;
+      const clash = placed.some((b) => box.x0 < b.x1 && box.x1 > b.x0 && box.y0 < b.y1 && box.y1 > b.y0);
+      if (!inside || clash) continue;
+      placed.push(box);
+      s.append('text').attr('class', 'hv-lab').attr('x', side === 'l' ? cx - 12 : cx + 12).attr('y', cy).attr('dy', '0.35em').attr('text-anchor', side === 'l' ? 'end' : 'start').style('font-weight', p.win ? 700 : 400).text(p.n);
+      break;
+    }
   });
   s.selectAll('circle.h').data(d).join('circle').attr('class', 'h').attr('cx', (p) => x(p.w)).attr('cy', (p) => y(p.v)).attr('r', 14).style('fill', 'transparent')
     .on('pointermove pointerdown', (ev, p) => t.show(ev, [p.n, hv.fmt(p.v, 'int') + ' phiếu', hv.fmt(p.w, 'int') + ' lượt xem hồ sơ', hv.fmt(p.v / p.w, 'int') + ' phiếu mỗi lượt xem']))
